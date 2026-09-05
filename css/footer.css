@@ -1,0 +1,33 @@
+/* ==========================================================================
+   footer.css — copyright + social icon links
+   Mobile-first: stacked and centered; row layout >= 768px.
+   ========================================================================== */
+
+.site-footer {
+  padding-block: 2.5rem;
+  background-color: var(--color-bg);
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.footer-copy {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--color-text-muted);
+}
+
+/* Tablet and up: copyright left, socials right */
+@media (min-width: 768px) {
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}

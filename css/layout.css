@@ -1,0 +1,163 @@
+/* ==========================================================================
+   layout.css — shared layout & reusable primitives used across components
+   ========================================================================== */
+
+/* ---------- Container ---------- */
+
+.container {
+  width: 100%;
+  max-width: var(--container-width);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* ---------- Sections (roomy, minimal negative-space layout) ---------- */
+
+.section {
+  padding-block: 5rem;
+}
+
+.section-head {
+  max-width: 42rem;
+  margin-inline: auto;
+  margin-bottom: 3.5rem;
+  text-align: center;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  margin-top: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 300;
+}
+
+/* ---------- Buttons (white / inverted for contrast on black) ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  background-color: var(--color-text);
+  color: #000000;
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* Hover inverts: white/black-text button becomes outlined black w/ white text */
+.btn:hover {
+  transform: scale(1.05);
+  background-color: #000000;
+  color: var(--color-text);
+  border-color: var(--color-text);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-text);
+}
+
+.btn-outline:hover {
+  transform: scale(1.05);
+  background-color: var(--color-text);
+  color: #000000;
+  border-color: var(--color-text);
+}
+
+.btn-outline:active {
+  transform: scale(0.98);
+}
+
+/* ---------- Chips (project tags / skill tags) ---------- */
+
+.chip {
+  display: inline-block;
+  padding: 0.2rem 0.75rem;
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Social icon links (contact + footer) ---------- */
+
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--color-text-muted);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.social-link:hover {
+  transform: scale(1.15);
+  color: var(--color-text);
+  border-color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.social-link svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* ---------- Breakpoint helpers ----------
+   Mobile-first: base rules above cover mobile (<=480px) up to the first
+   breakpoint. Layout loosens up at 768px (tablet) and 1024px (desktop).
+   ---------- */
+
+@media (min-width: 768px) {
+  .section {
+    padding-block: 6rem;
+  }
+
+  .section-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding-block: 7rem;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+  }
+
+  .section-head {
+    margin-bottom: 4rem;
+  }
+}

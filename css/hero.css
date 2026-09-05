@@ -1,0 +1,91 @@
+/* ==========================================================================
+   hero.css — full-viewport intro (script accent, name, tagline, scroll arrow)
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  /* Prefer the small-viewport unit where supported (mobile URL bar) */
+  min-height: 100svh;
+  padding-block: 5rem 7rem; /* leave room for the scroll indicator */
+  border-bottom: 1px solid var(--color-border-soft);
+  text-align: center;
+  /* Clip the 3D canvas injected by js/hero-scene.js to this section */
+  overflow: hidden;
+}
+
+/* Keep hero text above the 3D background canvas (z-index:0) */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 46rem;
+}
+
+/* Handwritten-style accent line — the only script-font usage on the site */
+.hero-script {
+  margin-bottom: 0.75rem;
+  font-family: var(--font-script);
+  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.75rem, 8vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--color-text);
+}
+
+.hero-tagline {
+  margin-top: 1.25rem;
+  font-weight: 300;
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  color: var(--color-text-body);
+}
+
+/* Scroll-down arrow -> About section */
+.scroll-indicator {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.scroll-indicator:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+  background-color: var(--color-surface);
+}
+
+.scroll-indicator svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Small phones: pull the arrow up so it clears the fold cleanly */
+@media (max-width: 480px) {
+  .hero {
+    padding-block: 4rem 6.5rem;
+  }
+
+  .scroll-indicator {
+    bottom: 1.25rem;
+  }
+}

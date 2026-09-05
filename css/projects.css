@@ -1,0 +1,106 @@
+/* ==========================================================================
+   projects.css — responsive card grid (equal-height cards)
+   Columns: 1 on mobile, 2 on tablet (>= 768px), 3 on desktop (>= 1024px).
+   ========================================================================== */
+
+.project-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* mobile */
+  gap: 1.5rem;
+}
+
+/* Card is a flex column so all cards in a row stretch to equal height */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.875rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  border-color: var(--color-text-body); /* dark grey -> light grey/white */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 18px 44px -16px rgba(255, 255, 255, 0.14);
+}
+
+/* Placeholder thumbnail area (swap for an <img> later) */
+.project-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  background-color: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 300;
+}
+
+.project-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.project-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Grows so tags + link sit at the bottom and stay aligned across cards */
+.project-desc {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--color-text-muted);
+}
+
+.project-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.project-link {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 0.35rem;
+  /* Compensate the padding so resting text stays flush with the card body */
+  margin-left: -1rem;
+  padding: 0.45rem 1rem;
+  border-radius: 2px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Inverts to a solid white chip w/ black text + slight scale on hover */
+.project-link:hover {
+  transform: scale(1.05);
+  background-color: var(--color-text);
+  color: #000000;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1024px) {
+  .project-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}

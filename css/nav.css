@@ -1,0 +1,228 @@
+/* ==========================================================================
+   nav.css — fixed header, desktop link row, mobile hamburger + slide-in panel
+   Mobile-first: base rules target small screens (<=480px, also 481-767px);
+   the full horizontal nav appears at the 768px tablet breakpoint.
+   ========================================================================== */
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Translucent + blurred once the hero has been scrolled past
+   (class toggled by js/animations.js) */
+.site-header.nav-scrolled {
+  background-color: rgba(0, 0, 0, 0.72);
+  border-bottom-color: var(--color-border-soft);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* ---------- Navbar row ---------- */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--header-height);
+  position: relative;
+}
+
+.logo {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--color-text);
+}
+
+/* Keep the toggle above the slide-in panel so it can always close it */
+.nav-toggle {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.45rem;
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+}
+
+.nav-toggle-bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-text);
+}
+
+/* Hamburger -> X when the menu is open */
+.menu-open .nav-toggle-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.menu-open .nav-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-open .nav-toggle-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ---------- Mobile slide-in panel (default, < 768px) ---------- */
+
+.nav-links {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: min(78%, 19rem);
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  padding: calc(var(--header-height) + 1.5rem) 1.5rem 2rem;
+  background-color: var(--color-bg);
+  border-left: 1px solid var(--color-border);
+  overflow-y: auto;
+  transform: translateX(100%);
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.2s ease, visibility 0.2s ease;
+}
+
+.menu-open .nav-links {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Nav links: white underline grows in on hover, stays on the active section */
+.nav-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.25rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  transition: color 0.18s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  bottom: 0.15rem;
+  height: 2px;
+  background-color: var(--color-text);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.18s ease;
+}
+
+.nav-link:hover {
+  color: var(--color-text);
+}
+
+.nav-link.active {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Fallback underline for the active link (mobile / reduced motion);
+   on desktop the sliding indicator (below) replaces it */
+.nav-link.active::after,
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* Click-away backdrop (body-level element) */
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background-color: rgba(0, 0, 0, 0.6);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.menu-open .nav-backdrop {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Prevent the page behind from scrolling while the menu is open */
+.menu-open {
+  overflow: hidden;
+}
+
+/* Sliding indicator element (displayed only on desktop nav) */
+.nav-indicator {
+  display: none;
+}
+
+/* ---------- Tablet / desktop (>= 768px): inline horizontal nav ---------- */
+
+@media (min-width: 768px) {
+  .nav-toggle {
+    display: none;
+  }
+
+  .nav-links {
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    gap: 2.5rem;
+    width: auto;
+    height: auto;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    overflow: visible;
+    transform: none;
+    visibility: visible;
+    pointer-events: auto;
+    transition: none;
+  }
+
+  .nav-link {
+    padding: 0.5rem 0.1rem;
+  }
+
+  .nav-link::after {
+    left: 0.1rem;
+    right: 0.1rem;
+    bottom: 0.1rem;
+  }
+
+  /* Sliding active-link indicator created by js/animations.js (desktop) */
+  .nav-indicator {
+    display: block;
+    position: absolute;
+    bottom: 0.1rem;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-text);
+    pointer-events: none;
+  }
+
+  /* The indicator takes over from the link's own underline on desktop */
+  body.gsap-motion .nav-link.active::after {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+}

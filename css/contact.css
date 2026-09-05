@@ -1,0 +1,132 @@
+/* ==========================================================================
+   contact.css — contact form + details/socials column
+   Mobile-first: form and aside stack; two columns >= 768px.
+   ========================================================================== */
+
+.contact-grid {
+  display: grid;
+  gap: 3rem;
+}
+
+/* ---------- Form ---------- */
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-body);
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  color: var(--color-text);
+  transition: border-color 0.18s ease;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #666666;
+  font-weight: 300;
+}
+
+.form-field textarea {
+  min-height: 10rem;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--color-focus);
+}
+
+/* Shrink the form so the fields sit beside the info on desktop */
+.contact-form .btn {
+  align-self: flex-start;
+}
+
+.form-status {
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--color-text-muted);
+}
+
+/* Name + email side by side once there is room */
+@media (min-width: 1024px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- Info + socials ---------- */
+
+.contact-info h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.contact-info > p {
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+  color: var(--color-text-muted);
+}
+
+.contact-details li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text-body);
+  word-break: break-word;
+}
+
+.contact-details li + li {
+  margin-top: 0.6rem;
+}
+
+.contact-details strong {
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.contact-details a {
+  color: var(--color-text);
+  font-weight: 300;
+}
+
+.contact-details a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.contact-info .social-links {
+  margin-top: 2rem;
+}
+
+/* Tablet / desktop: form left, info right */
+@media (min-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem;
+    align-items: start;
+  }
+}

@@ -1,0 +1,47 @@
+/* ==========================================================================
+   about.css — photo placeholder + bio text
+   Mobile-first: image and text stack in one column; side-by-side >= 768px.
+   ========================================================================== */
+
+.about-grid {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Placeholder frame for the profile photo (swap for an <img> later) */
+.about-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+  aspect-ratio: 1 / 1;
+  padding: 1rem;
+  background-color: var(--color-surface);
+  border: 2px dashed var(--color-border);
+  border-radius: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.about-text p + p {
+  margin-top: 1rem;
+}
+
+.about-text em {
+  color: var(--color-text-muted);
+}
+
+/* Tablet (>= 768px) and up: photo left, text right */
+@media (min-width: 768px) {
+  .about-grid {
+    grid-template-columns: minmax(0, 20rem) 1fr;
+    gap: 3rem;
+  }
+
+  .about-photo {
+    margin-inline: 0;
+  }
+}

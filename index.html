@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Personal portfolio of Ansh Saini — first-year B.Tech CSE student at USICT, GGSIPU." />
+  <title>Ansh Saini | Portfolio</title>
+
+  <!-- Fonts: Sora (display/headings), Poppins (body), Caveat (hero script accent) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Sora:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Component stylesheets (loaded in cascade order) -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <link rel="stylesheet" href="css/hero.css" />
+  <link rel="stylesheet" href="css/about.css" />
+  <link rel="stylesheet" href="css/projects.css" />
+  <link rel="stylesheet" href="css/resume.css" />
+  <link rel="stylesheet" href="css/contact.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+
+  <script src="js/main.js" defer></script>
+</head>
+
+<body>
+  <!-- Inline SVG sprite (symbols referenced with <use>) -->
+  <svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-github" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+    </symbol>
+    <symbol id="icon-linkedin" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4V9h4v1.5A6 6 0 0 1 16 8z" />
+      <rect x="2" y="9" width="4" height="12" fill="none" stroke="currentColor" stroke-width="2" />
+      <circle cx="4" cy="4" r="2" fill="none" stroke="currentColor" stroke-width="2" />
+    </symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        points="22,6 12,13 2,6" />
+    </symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+      <polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        points="6 9 12 15 18 9" />
+    </symbol>
+  </svg>
+
+  <!-- Click-away backdrop for the mobile menu -->
+  <div class="nav-backdrop" id="navBackdrop" hidden></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container navbar">
+      <a class="logo" href="#home" aria-label="Ansh Saini — back to top">AS</a>
+
+      <!-- Hamburger (mobile only) -->
+      <button class="nav-toggle" id="navToggle" type="button"
+        aria-label="Toggle navigation menu" aria-controls="navLinks" aria-expanded="false">
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a class="nav-link" href="#home">Home</a></li>
+        <li><a class="nav-link" href="#about">About</a></li>
+        <li><a class="nav-link" href="#projects">Projects</a></li>
+        <li><a class="nav-link" href="#resume">Resume</a></li>
+        <li><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ============ 1. HERO / HOME ============ -->
+    <section class="hero" id="home" aria-label="Introduction">
+      <div class="container hero-content">
+        <p class="hero-script">I love creating</p>
+        <h1 class="hero-title">Ansh Saini</h1>
+        <p class="hero-tagline">CSE Student | Aspiring Developer</p>
+      </div>
+      <a class="scroll-indicator" href="#about" aria-label="Scroll down to the About section">
+        <svg aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
+      </a>
+    </section>
+
+    <!-- ============ 2. ABOUT ============ -->
+    <section class="section about" id="about" aria-labelledby="about-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="section-title" id="about-title">About Me</h2>
+          <p class="section-subtitle">A short introduction</p>
+        </div>
+
+        <div class="about-grid">
+          <!-- Placeholder for the profile photo -->
+          <div class="about-photo" role="img" aria-label="Placeholder for Ansh Saini's profile photo">
+            Your photo here
+          </div>
+
+          <div class="about-text">
+            <p>
+              Hello! I'm Ansh Saini, a first-year B.Tech Computer Science &amp; Engineering student at
+              USICT, Guru Gobind Singh Indraprastha University (GGSIPU), New Delhi.
+              <em>(This is placeholder bio text — replace it once the real content is ready.)</em>
+            </p>
+            <p>
+              I'm currently learning programming fundamentals, problem solving and web development,
+              and I enjoy turning ideas into small working projects. Add a personal note about your
+              interests, goals, or what you're working on right now here.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. PROJECTS ============ -->
+    <section class="section projects" id="projects" aria-labelledby="projects-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="section-title" id="projects-title">Projects</h2>
+          <p class="section-subtitle">A few things I've built (placeholders)</p>
+        </div>
+
+        <div class="project-grid">
+          <!-- Project card 1 -->
+          <article class="project-card">
+            <div class="project-thumb" aria-hidden="true">Image placeholder</div>
+            <div class="project-card-body">
+              <h3 class="project-title">Personal Portfolio Website</h3>
+              <p class="project-desc">
+                A responsive single-page portfolio built with semantic HTML, CSS and vanilla
+                JavaScript — this very site, structure-first.
+              </p>
+              <ul class="project-tech" aria-label="Technologies used">
+                <li class="chip">HTML</li>
+                <li class="chip">CSS</li>
+                <li class="chip">JavaScript</li>
+              </ul>
+              <!-- TODO: point at the live project once it exists -->
+              <a class="project-link" href="#" aria-label="View project: Personal Portfolio Website">View Project &rarr;</a>
+            </div>
+          </article>
+
+          <!-- Project card 2 -->
+          <article class="project-card">
+            <div class="project-thumb" aria-hidden="true">Image placeholder</div>
+            <div class="project-card-body">
+              <h3 class="project-title">To-Do List App</h3>
+              <p class="project-desc">
+                A simple task manager with add, complete, filter and clear functionality — a
+                practice project for core DOM and state handling.
+              </p>
+              <ul class="project-tech" aria-label="Technologies used">
+                <li class="chip">JavaScript</li>
+                <li class="chip">HTML</li>
+                <li class="chip">CSS</li>
+              </ul>
+              <!-- TODO: point at the live project once it exists -->
+              <a class="project-link" href="#" aria-label="View project: To-Do List App">View Project &rarr;</a>
+            </div>
+          </article>
+
+          <!-- Project card 3 -->
+          <article class="project-card">
+            <div class="project-thumb" aria-hidden="true">Image placeholder</div>
+            <div class="project-card-body">
+              <h3 class="project-title">Weather App</h3>
+              <p class="project-desc">
+                A weather lookup that fetches current conditions for a searched city. Placeholder
+                description — final API and features to be decided.
+              </p>
+              <ul class="project-tech" aria-label="Technologies used">
+                <li class="chip">JavaScript</li>
+                <li class="chip">API</li>
+                <li class="chip">CSS</li>
+              </ul>
+              <!-- TODO: point at the live project once it exists -->
+              <a class="project-link" href="#" aria-label="View project: Weather App">View Project &rarr;</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. RESUME ============ -->
+    <section class="section resume" id="resume" aria-labelledby="resume-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="section-title" id="resume-title">Resume</h2>
+          <p class="section-subtitle">Education and skills</p>
+        </div>
+
+        <div class="resume-grid">
+          <!-- Education -->
+          <div class="resume-col">
+            <h3>Education</h3>
+            <ul class="resume-list">
+              <li class="edu-item">
+                <h4>B.Tech in Computer Science &amp; Engineering</h4>
+                <span class="edu-institution">USICT, Guru Gobind Singh Indraprastha University (GGSIPU)</span>
+                <span class="edu-meta">First Year &middot; 2026 &ndash; 2030 (Expected)</span>
+              </li>
+              <li class="edu-item">
+                <h4>Senior Secondary (Class XII), CBSE</h4>
+                <span class="edu-institution">[School Name]</span>
+                <span class="edu-meta">2024 &ndash; 2026</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Skills -->
+          <div class="resume-col">
+            <h3>Skills</h3>
+            <!-- Skill placeholders — replace with your real stack -->
+            <div class="skill-group">
+              <h4>Languages</h4>
+              <ul class="skill-tags">
+                <li class="chip">C</li>
+                <li class="chip">C++</li>
+                <li class="chip">Python</li>
+                <li class="chip">JavaScript</li>
+                <li class="chip">Java</li>
+              </ul>
+            </div>
+            <div class="skill-group">
+              <h4>Frameworks &amp; Libraries</h4>
+              <ul class="skill-tags">
+                <li class="chip">React</li>
+                <li class="chip">Bootstrap</li>
+                <li class="chip">Node.js</li>
+              </ul>
+            </div>
+            <div class="skill-group">
+              <h4>Tools</h4>
+              <ul class="skill-tags">
+                <li class="chip">Git &amp; GitHub</li>
+                <li class="chip">VS Code</li>
+                <li class="chip">Linux</li>
+                <li class="chip">Figma</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="resume-actions">
+          <!-- TODO: replace href with the real PDF path -->
+          <a class="btn" href="#" download>Download Resume</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5. CONTACT ============ -->
+    <section class="section contact" id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="section-title" id="contact-title">Contact</h2>
+          <p class="section-subtitle">Get in touch</p>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Contact form (not wired to a backend yet) -->
+          <form class="contact-form" id="contactForm" action="#" method="post" novalidate>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="formName">Name</label>
+                <input type="text" id="formName" name="name" placeholder="Your name" autocomplete="name" required />
+              </div>
+              <div class="form-field">
+                <label for="formEmail">Email</label>
+                <input type="email" id="formEmail" name="email" placeholder="you@example.com" autocomplete="email" required />
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="formMessage">Message</label>
+              <textarea id="formMessage" name="message" rows="6" placeholder="Write your message here..." required></textarea>
+            </div>
+            <button class="btn" type="submit">Send Message</button>
+            <p class="form-status" id="formStatus" role="status"></p>
+          </form>
+
+          <!-- Contact details + socials -->
+          <aside class="contact-info" aria-label="Contact details and social links">
+            <h3>Let's Connect</h3>
+            <p>
+              The fastest way to reach me is by email. Send a message through the form or find me
+              on the platforms below.
+            </p>
+
+            <ul class="contact-details">
+              <li>
+                <strong>Email:</strong>
+                <a href="mailto:hello@anshsaini.dev">hello@anshsaini.dev</a>
+              </li>
+              <li><strong>Location:</strong> New Delhi, India</li>
+            </ul>
+
+            <!-- TODO: replace # links with the real profile URLs -->
+            <ul class="social-links" aria-label="Social media links">
+              <li>
+                <a class="social-link" href="#" aria-label="GitHub profile">
+                  <svg aria-hidden="true"><use href="#icon-github"></use></svg>
+                </a>
+              </li>
+              <li>
+                <a class="social-link" href="#" aria-label="LinkedIn profile">
+                  <svg aria-hidden="true"><use href="#icon-linkedin"></use></svg>
+                </a>
+              </li>
+              <li>
+                <a class="social-link" href="mailto:hello@anshsaini.dev" aria-label="Send an email">
+                  <svg aria-hidden="true"><use href="#icon-mail"></use></svg>
+                </a>
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-copy">&copy; 2026 Ansh Saini</p>
+
+      <!-- TODO: replace # links with the real profile URLs -->
+      <ul class="social-links" aria-label="Social media links">
+        <li>
+          <a class="social-link" href="#" aria-label="GitHub profile">
+            <svg aria-hidden="true"><use href="#icon-github"></use></svg>
+          </a>
+        </li>
+        <li>
+          <a class="social-link" href="#" aria-label="LinkedIn profile">
+            <svg aria-hidden="true"><use href="#icon-linkedin"></use></svg>
+          </a>
+        </li>
+        <li>
+          <a class="social-link" href="mailto:hello@anshsaini.dev" aria-label="Send an email">
+            <svg aria-hidden="true"><use href="#icon-mail"></use></svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Vendored libraries: GSAP (Standard license) + ScrollTrigger, Three.js (MIT) -->
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/vendor/three.min.js"></script>
+  <script src="js/hero-scene.js"></script>
+  <!-- Site motion layer (scroll reveals, hero entrance, nav effects) -->
+  <script src="js/animations.js"></script>
+</body>
+</html>
