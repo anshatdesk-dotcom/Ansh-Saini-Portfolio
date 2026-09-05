@@ -1,6 +1,6 @@
 /* ==========================================================================
-   about.css — photo placeholder + bio text
-   Mobile-first: image and text stack in one column; side-by-side >= 768px.
+   about.css — 3D sculpture stage + bio text
+   Mobile-first: sculpture and text stack in one column; side-by-side >= 768px.
    ========================================================================== */
 
 .about-grid {
@@ -9,21 +9,22 @@
   align-items: center;
 }
 
-/* Placeholder frame for the profile photo (swap for an <img> later) */
+/* Stage for the chrome 3D sculpture (canvas mounted by js/about-scene.js).
+   Same square slot and placement as the old photo placeholder. */
 .about-photo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  overflow: hidden;
   width: 100%;
   max-width: 20rem;
   margin-inline: auto;
   aspect-ratio: 1 / 1;
-  padding: 1rem;
-  background-color: var(--color-surface);
-  border: 2px dashed var(--color-border);
+  background-color: #0a0a0a;
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
-  color: var(--color-text-muted);
-  text-align: center;
+}
+
+.about-photo canvas {
+  border-radius: 0.75rem;
 }
 
 .about-text p + p {
@@ -34,7 +35,7 @@
   color: var(--color-text-muted);
 }
 
-/* Tablet (>= 768px) and up: photo left, text right */
+/* Tablet (>= 768px) and up: sculpture left, text right */
 @media (min-width: 768px) {
   .about-grid {
     grid-template-columns: minmax(0, 20rem) 1fr;

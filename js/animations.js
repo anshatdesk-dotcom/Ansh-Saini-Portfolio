@@ -97,16 +97,54 @@
       });
     };
 
-    buildSection({
-      id: "about",
-      groups: [
-        {
-          // Photo placeholder first, then each bio paragraph (~0.15s apart)
-          selector: ".about-grid .about-photo, .about-grid .about-text > p",
-          stagger: 0.15,
-        },
-      ],
-    });
+    /* ---- About: smooth one-shot entrance (no pin, no scrub) ----
+       Heading fades in + slides up 50px, subtitle follows, the 3D sculpture
+       gently fades up, then the bio paragraphs rise with a small stagger.
+       Fires once at ~75% into the viewport with power3.out easing; every
+       tween clears its inline styles afterwards so hover/3D interactions are
+       never shadowed by leftover transforms. */
+    const aboutEl = document.getElementById("about");
+    if (aboutEl) {
+      const aHead = aboutEl.querySelector(".section-head");
+      const aTitle = aHead && aHead.querySelector(".section-title");
+      const aSub = aHead && aHead.querySelector(".section-subtitle");
+      const aPhoto = aboutEl.querySelector(".about-photo");
+      const aParas = aboutEl.querySelectorAll(".about-text > p");
+
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: aboutEl, start: "top 75%", once: true },
+      });
+
+      const anim = (el, vars, pos) => {
+        if (el) tl.from(el, vars, pos);
+      };
+
+      anim(
+        aTitle,
+        { y: 50, autoAlpha: 0, duration: small ? 0.7 : 0.9, ease: "power3.out", clearProps: "transform,opacity,visibility" },
+        0
+      );
+      anim(
+        aSub,
+        { y: 22, autoAlpha: 0, duration: small ? 0.6 : 0.7, ease: "power3.out", clearProps: "transform,opacity,visibility" },
+        0.18
+      );
+      anim(
+        aPhoto,
+        { autoAlpha: 0, scale: 0.96, duration: small ? 0.7 : 0.85, ease: "power2.out", clearProps: "transform,opacity,visibility" },
+        0.25
+      );
+      anim(
+        aParas[0],
+        { y: 36, autoAlpha: 0, duration: small ? 0.6 : 0.75, ease: "power3.out", clearProps: "transform,opacity,visibility" },
+        0.55
+      );
+      anim(
+        aParas[1],
+        { y: 36, autoAlpha: 0, duration: small ? 0.6 : 0.75, ease: "power3.out", clearProps: "transform,opacity,visibility" },
+        0.75
+      );
+    }
 
     buildSection({
       id: "projects",
