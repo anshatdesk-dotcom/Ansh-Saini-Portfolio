@@ -1,0 +1,50 @@
+/* ==========================================================================
+   cursor.css — two-ball cursor with mix-blend-mode: difference
+   Reference: CodePen "Circle cursor with blend mode" by clementGir
+   ========================================================================== */
+
+/* Hide default cursor on all elements when cursor is active */
+body.glow-cursor-active,
+body.glow-cursor-active * {
+  cursor: none !important;
+}
+
+/* Shared ball styles */
+.cursor-ball {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: none;
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+/* Big ball — slow follower, scales up on hover */
+.cursor-ball--big {
+  width: 30px;
+  height: 30px;
+  background: #f7f8fa;
+  transform: translate(-50%, -50%);
+}
+
+/* Small ball — fast follower, stays small */
+.cursor-ball--small {
+  width: 10px;
+  height: 10px;
+  background: #f7f8fa;
+  transform: translate(-50%, -50%);
+}
+
+/* Touch devices: hide both balls */
+body.touch-device .cursor-ball {
+  display: none !important;
+}
+
+/* Reduced motion: skip GSAP tweens, snap directly */
+@media (prefers-reduced-motion: reduce) {
+  .cursor-ball {
+    transition: none !important;
+  }
+}

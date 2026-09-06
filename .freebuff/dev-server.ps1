@@ -1,49 +1,29 @@
-# Minimal loopback static file server used only for local preview.
-param([int]$Port = 8123)
-
-$ErrorActionPreference = 'Stop'
-$root = (Get-Location).Path
+$root = Split-Path -Parent $PSScriptRoot
+if (-not $root) { $root = $PWD.Path }
 $listener = New-Object System.Net.HttpListener
-$listener.Prefixes.Add("http://127.0.0.1:$Port/")
+$listener.Prefixes.Add("http://127.0.0.1:8123/")
 $listener.Start()
-Write-Output "Serving $root on http://127.0.0.1:$Port/"
-
+Write-Host "Serving $root on http://127.0.0.1:8123/"
 while ($listener.IsListening) {
-    $context = $listener.GetContext()
-    $res = $context.Response
-    try {
-        $rel = $context.Request.Url.AbsolutePath.TrimStart('/') -replace '/', [System.IO.Path]::DirectorySeparatorChar
-        if ($rel -eq '') { $rel = 'index.html' }
-        $full = [System.IO.Path]::GetFullPath((Join-Path $root $rel))
-        # Refuse paths that escape the project root
-        if (-not $full.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
-            $res.StatusCode = 403
-        }
-        elseif (Test-Path -LiteralPath $full -PathType Leaf) {
-            $bytes = [System.IO.File]::ReadAllBytes($full)
-            $ext = [System.IO.Path]::GetExtension($full).ToLowerInvariant()
-            $res.ContentType = switch ($ext) {
-                '.html' { 'text/html; charset=utf-8' }
-                '.css'  { 'text/css; charset=utf-8' }
-                '.js'   { 'application/javascript; charset=utf-8' }
-                '.svg'  { 'image/svg+xml' }
-                '.png'  { 'image/png' }
-                '.jpg'  { 'image/jpeg' }
-                '.webp' { 'image/webp' }
-                '.ico'  { 'image/x-icon' }
-                default { 'application/octet-stream' }
-            }
-            $res.ContentLength64 = $bytes.Length
-            $res.OutputStream.Write($bytes, 0, $bytes.Length)
-        }
-        else {
-            $res.StatusCode = 404
-        }
+  $ctx = $listener.GetContext()
+  $path = $ctx.Request.Url.LocalPath
+  if ($path -eq "/") { $path = "/index.html" }
+  $file = Join-Path $root ($path.TrimStart("/").Replace("/", "\"))
+  if (Test-Path $file) {
+    $bytes = [IO.File]::ReadAllBytes($file)
+    $ext = [IO.Path]::GetExtension($file).ToLower()
+    $ct = switch ($ext) {
+      ".html" { "text/html" } ".css" { "text/css" } ".js" { "application/javascript" }
+      ".jpg" { "image/jpeg" } ".png" { "image/png" } ".svg" { "image/svg+xml" }
+      ".woff2" { "font/woff2" } default { "application/octet-stream" }
     }
-    catch {
-        try { $res.StatusCode = 500 } catch { }
-    }
-    finally {
-        try { $res.Close() } catch { }
-    }
+    $ctx.Response.ContentType = $ct
+    $ctx.Response.ContentLength64 = $bytes.Length
+    $ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
+  } else {
+    $ctx.Response.StatusCode = 404
+    $body = [Text.Encoding]::UTF8.GetBytes("404")
+    $ctx.Response.OutputStream.Write($body, 0, $body.Length)
+  }
+  $ctx.Response.Close()
 }

@@ -48,12 +48,10 @@
     const rise = small ? 22 : 40;
     const ease = "power3.out";
 
-    /* ---- 1. Hero load-in: accent line, then name, then tagline ---- */
+    /* ---- 1. Hero load-in: name (tagline is typed by js/hero-typewriter.js) ---- */
     gsap
       .timeline({ delay: 0.1 })
-      .from(".hero-script", { y: 14, autoAlpha: 0, duration: dur, ease, clearProps: "transform,opacity,visibility" }, 0)
-      .from(".hero-title", { y: rise, autoAlpha: 0, duration: dur, ease, clearProps: "transform,opacity,visibility" }, "-=0.3")
-      .from(".hero-tagline", { y: 20, autoAlpha: 0, duration: dur, ease, clearProps: "transform,opacity,visibility" }, "-=0.5");
+      .from(".hero-title", { y: rise, autoAlpha: 0, duration: dur, ease, clearProps: "transform,opacity,visibility" }, 0);
 
     /* ---- 2. Section reveal builder (once per element, ~80% into view) ---- */
     const buildSection = (cfg) => {

@@ -1,0 +1,70 @@
+/* ==========================================================================
+   hero-tunnel.css — "Hyper Scroll" depth tunnel, full-page background layer
+
+   A viewport-fixed layer with CSS perspective holding a preserve-3d "world"
+   of star dots and thin glowing streak trails at negative Z depths.
+   js/hero-tunnel.js advances each element's Z with scroll (Lenis smooth
+   scroll) so stars and light trails stream toward and past the viewer across
+   the whole page — behind the Hero, About, Projects, Resume and Contact
+   sections. Streaks stretch as they approach the camera so they read as
+   motion trails, not static dashes.
+
+   Stacking: attached to <body> at z-index:-1, the layer paints above the
+   page's black canvas background and below every content element;
+   pointer-events:none so it never intercepts clicks. Lenis
+   (js/vendor/lenis.min.js) provides the smooth scroll.
+   ========================================================================== */
+
+/* Lenis drives the easing — neutralise the site's CSS smooth-scroll so the
+   two never fight over every scrollTo. */
+html.lenis,
+html.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.depth-tunnel {
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* above the black page backdrop, below all content */
+  pointer-events: none;
+  overflow: hidden;
+  perspective: 1100px; /* widened at speed by JS */
+  perspective-origin: 50% 50%;
+  will-change: perspective;
+}
+
+.depth-tunnel-world {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* --- stars: tiny monochrome dots, sized by depth in JS --------------- */
+.depth-tunnel-star {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
+
+/* --- streaks: thin glowing light trails ------------------------------ */
+.depth-tunnel-streak {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 3px;
+  /* Soft vertical core with feathered ends — glows, not a hard dash */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 42%,
+    rgba(255, 255, 255, 0.95) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  will-change: transform, opacity;
+}

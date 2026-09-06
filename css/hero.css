@@ -24,16 +24,6 @@
   max-width: 46rem;
 }
 
-/* Handwritten-style accent line — the only script-font usage on the site */
-.hero-script {
-  margin-bottom: 0.75rem;
-  font-family: var(--font-script);
-  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--color-text);
-}
-
 .hero-title {
   font-family: var(--font-heading);
   font-size: clamp(2.75rem, 8vw, 5rem);
@@ -48,6 +38,39 @@
   font-weight: 300;
   font-size: clamp(1rem, 2.5vw, 1.35rem);
   color: var(--color-text-body);
+}
+
+/* Rotating-role typewriter (see js/hero-typewriter.js) */
+.typewriter-text {
+  white-space: pre;
+}
+
+/* Solid block caret, blinks like a terminal cursor */
+.typewriter-caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1.05em;
+  margin-left: 0.12em;
+  vertical-align: -0.15em;
+  background: var(--color-text);
+  animation: typewriter-blink 1.05s steps(1) infinite;
+}
+
+@keyframes typewriter-blink {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-caret {
+    animation: none;
+  }
 }
 
 /* Scroll-down arrow -> About section */

@@ -6,11 +6,11 @@
   <meta name="description" content="Personal portfolio of Ansh Saini — first-year B.Tech CSE student at USICT, GGSIPU." />
   <title>Ansh Saini | Portfolio</title>
 
-  <!-- Fonts: Sora (display/headings), Poppins (body), Caveat (hero script accent) -->
+  <!-- Fonts: Sora (display/headings), Poppins (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Sora:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Sora:wght@500;600;700;800&display=swap"
     rel="stylesheet"
   />
 
@@ -24,6 +24,8 @@
   <link rel="stylesheet" href="css/resume.css" />
   <link rel="stylesheet" href="css/contact.css" />
   <link rel="stylesheet" href="css/footer.css" />
+  <link rel="stylesheet" href="css/cursor.css" />
+  <link rel="stylesheet" href="css/hero-tunnel.css" />
 
   <script src="js/main.js" defer></script>
 </head>
@@ -83,9 +85,8 @@
     <!-- ============ 1. HERO / HOME ============ -->
     <section class="hero" id="home" aria-label="Introduction">
       <div class="container hero-content">
-        <p class="hero-script">I love creating</p>
         <h1 class="hero-title">Ansh Saini</h1>
-        <p class="hero-tagline">CSE Student | Aspiring Developer</p>
+        <p class="hero-tagline" data-words="CSE Student,Aspiring Developer">CSE Student | Aspiring Developer</p>
       </div>
       <a class="scroll-indicator" href="#about" aria-label="Scroll down to the About section">
         <svg aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
@@ -352,14 +353,21 @@
     </div>
   </footer>
 
-  <!-- Vendored libraries: GSAP (Standard license) + ScrollTrigger, Three.js (MIT) -->
+  <!-- Vendored libraries: GSAP (Standard license) + ScrollTrigger, Three.js (MIT), Lenis (MIT) -->
   <script src="js/vendor/gsap.min.js"></script>
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <script src="js/vendor/three.min.js"></script>
+  <script src="js/vendor/lenis.min.js"></script>
   <script src="js/hero-scene.js"></script>
   <!-- Chrome 3D sculpture for the About section -->
   <script src="js/about-scene.js"></script>
   <!-- Site motion layer (scroll reveals, hero entrance, nav effects) -->
   <script src="js/animations.js"></script>
+  <!-- Rotating-roles typewriter for the hero tagline -->
+  <script src="js/hero-typewriter.js"></script>
+  <!-- Custom glowing cursor (must be last: needs full DOM + no deps) -->
+  <script src="js/cursor.js"></script>
+  <!-- Hyper-scroll depth tunnel + Lenis smooth scroll (depends on Lenis) -->
+  <script src="js/hero-tunnel.js"></script>
 </body>
 </html>
