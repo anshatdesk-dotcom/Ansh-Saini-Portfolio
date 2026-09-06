@@ -75,7 +75,7 @@
   world.add(core);
 
   // Sparse particle orbit ring in white/grey
-  const orbitCount = isMobile ? 160 : 420;
+  const orbitCount = isMobile ? 140 : 300;
   const positions = new Float32Array(orbitCount * 3);
   for (let i = 0; i < orbitCount; i++) {
     const angle = Math.random() * Math.PI * 2;

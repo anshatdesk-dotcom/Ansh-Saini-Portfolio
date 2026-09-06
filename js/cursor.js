@@ -98,12 +98,13 @@
     ".scroll-indicator",
     ".nav-toggle",
     ".chip",
+    ".hero-title",
   ].join(",");
 
   const handleEnter = () => {
     gsap.to(bigBall, {
-      scale: 4,
-      duration: 0.3,
+      scale: 3,
+      duration: 0.2,
       ease: "power2.out",
       overwrite: "auto",
     });
