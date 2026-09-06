@@ -16,8 +16,9 @@
    2. Depth tunnel — a fixed, pointer-events:none perspective layer attached
       to <body> at z-index:-1, i.e. above the page's black backdrop and below
       every section's content (Hero text, About's chrome sculpture, project
-      cards, Resume, Contact, the custom cursor). It holds star dots and thin
-      glass cards, each parked at a world (x, y) and a negative Z depth.
+      cards,      Resume, Contact, the custom cursor). It holds star dots and thin
+      glowing streak trails, each parked at a world (x, y) and a negative Z
+      depth.
 
       As the user scrolls the ENTIRE page, every element's Z advances through
       a looped band (deep → camera → past): the browser's CSS perspective
@@ -32,8 +33,8 @@
       the page is visible and being scrolled, keeping the frame cost low
       alongside the hero's Three.js scene and the About chrome sculpture.
 
-   Monochrome only — white/grey stars and dark glass cards with thin light
-   borders. No scanlines, noise, or RGB-split effects.
+   Monochrome only — white/grey stars and white/grey glowing streaks.
+   No scanlines, noise, or RGB-split effects.
    ========================================================================== */
 
 (() => {
@@ -136,14 +137,21 @@
 
   const items = [];
 
-  // --- stars: tiny monochrome dots -------------------------------------
-  const STAR_COUNT = isMobile ? 55 : 120;
+  /* --- stars: tiny monochrome dots -------------------------------------
+     Dense field of dots, sized by depth (closer stars start larger), which
+     the CSS projection further grows as they approach. */
+  const STAR_COUNT = isMobile ? 100 : 220;
+  const Z_NEAR_START = -650; // shallowest rest position for stars
+  const Z_FAR_START = Z_DEEP + 60;
+
   for (let i = 0; i < STAR_COUNT; i++) {
-    const z0 = R(Z_DEEP + 60, -650); // deep start, nothing at rest near camera
+    const z0 = R(Z_FAR_START, Z_NEAR_START);
     const s0 = projScale(z0, FOV_BASE);
     const nx = R(-0.55, 0.55);
     const ny = R(-0.48, 0.48);
-    const size = R(2, 5.5);
+    // closeness 0 (far) .. 1 (near camera) -> dot size ~1px .. ~3.5px
+    const close = (z0 - Z_FAR_START) / (Z_NEAR_START - Z_FAR_START);
+    const size = Math.min(4.2, 1.1 + close * 2.6 + R(-0.4, 0.7));
     const shade = Math.random();
     const el = makeItem("span", "depth-tunnel-star", {
       width: `${size.toFixed(1)}px`,
@@ -159,27 +167,38 @@
       x0: (nx * window.innerWidth) / s0,
       y0: (ny * window.innerHeight) / s0,
       z0,
-      base: R(0.3, 0.9),
+      base: R(0.35, 0.95),
     });
   }
 
-  // --- cards: thin glass rectangles -------------------------------------
-  const cardCount = isMobile ? 6 : 9;
-  for (let i = 0; i < cardCount; i++) {
-    const t = cardCount === 1 ? 0 : i / (cardCount - 1);
-    const z0 = Z_DEEP + 250 + t * (7800 - 250); // deep .. near (evenly spaced)
+  /* --- streaks: thin glowing light trails -------------------------------
+     Occasional brighter, elongated lines mixed into the star field. Short
+     vertical/diagonal segments with feathered ends and a soft box-shadow
+     glow; brightness varies per streak. They use the same scroll-driven Z
+     loop as the stars and stretch along their axis (scaleY) as they near
+     the camera so they read as motion trails, not static dashes. */
+  const STREAK_COUNT = isMobile ? 25 : 55;
+  for (let i = 0; i < STREAK_COUNT; i++) {
+    const z0 = R(Z_FAR_START, Z_NEAR_START);
     const s0 = projScale(z0, FOV_BASE);
-    const w = R(90, 175);
-    const h = R(46, 92);
-    const nx = R(-0.5, 0.5);
-    const ny = R(-0.38, 0.38);
-    const el = makeItem("div", "depth-tunnel-card", {
-      width: `${w.toFixed(0)}px`,
-      height: `${h.toFixed(0)}px`,
-      marginLeft: `${(-w / 2).toFixed(0)}px`,
-      marginTop: `${(-h / 2).toFixed(0)}px`,
+    const nx = R(-0.55, 0.55);
+    const ny = R(-0.46, 0.46);
+    const len = R(18, 58);
+    const thick = R(1, 2);
+    // Vertical-ish with a diagonal mix: mostly slight angles, some steeper.
+    const angle = R(-50, 50);
+    const bright = Math.random();
+
+    const el = makeItem("span", "depth-tunnel-streak", {
+      width: `${thick.toFixed(1)}px`,
+      height: `${len.toFixed(1)}px`,
+      marginLeft: `${(-thick / 2).toFixed(1)}px`,
+      marginTop: `${(-len / 2).toFixed(1)}px`,
       opacity: "0",
     });
+    el.style.boxShadow = `0 0 ${(4 + bright * 14).toFixed(1)}px ${(0.5 + bright * 2.5).toFixed(1)}px rgba(255,255,255,${(
+      0.2 + bright * 0.5
+    ).toFixed(2)})`;
     world.appendChild(el);
     items.push({
       el,
@@ -188,7 +207,9 @@
       x0: (nx * window.innerWidth) / s0,
       y0: (ny * window.innerHeight) / s0,
       z0,
-      base: R(0.55, 0.95),
+      base: R(0.22, 0.7),
+      isStreak: true,
+      angle,
     });
   }
 
@@ -258,7 +279,16 @@
       if (op > 1) op = 1;
       if (op < 0) op = 0;
 
-      it.el.style.transform = `translate3d(${it.x0.toFixed(1)}px, ${it.y0.toFixed(1)}px, ${z.toFixed(1)}px)`;
+      const pos = `translate3d(${it.x0.toFixed(1)}px, ${it.y0.toFixed(1)}px, ${z.toFixed(1)}px)`;
+      if (it.isStreak) {
+        // Stretch along the streak's own axis as it approaches the camera,
+        // turning the line into a motion trail; relax again far away.
+        const progress = Math.max(0, Math.min(1, (z - Z_DEEP) / SPAN));
+        const stretch = 1 + progress * 1.9;
+        it.el.style.transform = `${pos} rotate(${it.angle}deg) scaleY(${stretch.toFixed(2)})`;
+      } else {
+        it.el.style.transform = pos;
+      }
       it.el.style.opacity = op.toFixed(3);
     }
   };

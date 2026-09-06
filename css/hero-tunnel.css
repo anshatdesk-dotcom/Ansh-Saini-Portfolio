@@ -2,15 +2,17 @@
    hero-tunnel.css — "Hyper Scroll" depth tunnel, full-page background layer
 
    A viewport-fixed layer with CSS perspective holding a preserve-3d "world"
-   of tiny star dots and thin glass-style cards at negative Z depths.
+   of star dots and thin glowing streak trails at negative Z depths.
    js/hero-tunnel.js advances each element's Z with scroll (Lenis smooth
-   scroll) so stars/cards stream toward and past the viewer across the whole
-   page — behind the Hero, About, Projects, Resume and Contact sections.
+   scroll) so stars and light trails stream toward and past the viewer across
+   the whole page — behind the Hero, About, Projects, Resume and Contact
+   sections. Streaks stretch as they approach the camera so they read as
+   motion trails, not static dashes.
 
    Stacking: attached to <body> at z-index:-1, the layer paints above the
-   page's black canvas background and below every content element, so it
-   never intercepts clicks (pointer-events:none) or covers foreground UI.
-   Lenis (js/vendor/lenis.min.js) provides the smooth scroll.
+   page's black canvas background and below every content element;
+   pointer-events:none so it never intercepts clicks. Lenis
+   (js/vendor/lenis.min.js) provides the smooth scroll.
    ========================================================================== */
 
 /* Lenis drives the easing — neutralise the site's CSS smooth-scroll so the
@@ -41,7 +43,7 @@ html.lenis-smooth {
   will-change: transform;
 }
 
-/* --- stars: tiny monochrome dots, matching the hero's particle field --- */
+/* --- stars: tiny monochrome dots, sized by depth in JS --------------- */
 .depth-tunnel-star {
   position: absolute;
   left: 0;
@@ -50,39 +52,19 @@ html.lenis-smooth {
   will-change: transform, opacity;
 }
 
-/* --- cards: thin glass-style rectangles (dark fill, light border, blur) --- */
-.depth-tunnel-card {
+/* --- streaks: thin glowing light trails ------------------------------ */
+.depth-tunnel-streak {
   position: absolute;
   left: 0;
   top: 0;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border-radius: 3px;
+  /* Soft vertical core with feathered ends — glows, not a hard dash */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 42%,
+    rgba(255, 255, 255, 0.95) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
   will-change: transform, opacity;
-}
-
-/* faint placeholder lines inside cards (decor only, no real content) */
-.depth-tunnel-card::before {
-  content: "";
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  top: 50%;
-  height: 2px;
-  border-radius: 1px;
-  background: rgba(255, 255, 255, 0.14);
-}
-
-.depth-tunnel-card::after {
-  content: "";
-  position: absolute;
-  left: 18%;
-  top: 28%;
-  width: 26%;
-  height: 2px;
-  border-radius: 1px;
-  background: rgba(255, 255, 255, 0.22);
 }
