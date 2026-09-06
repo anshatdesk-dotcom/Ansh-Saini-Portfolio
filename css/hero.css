@@ -15,13 +15,78 @@
   text-align: center;
   /* Clip the 3D canvas injected by js/hero-scene.js to this section */
   overflow: hidden;
+  /* Isolate blending so the "screen" card only blends with the hero's own
+     backdrop (3D canvas + spotlight discs + black), never the nav/page. */
+  isolation: isolate;
 }
 
-/* Keep hero text above the 3D background canvas (z-index:0) */
+/* ==========================================================================
+   Spotlight cursor reveal — "Spotlight Cursor Text Screen" technique
+
+   3 layers, bottom → top:
+     1. BASE    : the hero's black background + the Three.js wireframe canvas
+                  (dark backing behind the text).
+     2. MIDDLE  : 3 grey/white discs (550 / 340 / 170 px) injected by
+                  js/hero-spotlight.js; they chase the cursor with staggered
+                  GSAP lag, above the canvas but below the text.
+     3. TOP     : the hero text lives inside a light "screen" card
+                  (.container.hero-content). The card has a light background
+                  and mix-blend-mode: screen. Screen blending makes the
+                  card's DARK pixels transparent to its backdrop — so the
+                  dark letterforms act as windows: the grey discs sweeping
+                  underneath show through the glyphs (a moving spotlight /
+                  reveal), while the card itself reads as a crisp light
+                  plaque over the black hero. (White letters cannot be used
+                  inside the screen — screen(white, X) = white, which is why
+                  full-bleed light layers with white text washed out.)
+   ========================================================================== */
+
+.hero-spots {
+  position: absolute;
+  inset: 0;
+  z-index: 2; /* above the 3D canvas (z:0), below the text card (z:6) */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-spots-shape {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  will-change: transform;
+  /* Centred on the cursor by GSAP (xPercent/yPercent: -50) */
+}
+
+/* Keep hero text above the 3D background canvas (z-index:0) and the
+   spotlight discs. The text card doubles as the screen-blend top layer. */
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 6;
   max-width: 46rem;
+}
+
+/* Light "screen" card that wraps the hero text (JS injects nothing here —
+   .hero-content already contains the script line, name and tagline). */
+.container.hero-content {
+  width: fit-content;
+  max-width: min(46rem, calc(100% - 2rem));
+  background: #ebebeb;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 2rem;
+  padding: clamp(2.25rem, 6vw, 4rem) clamp(1.75rem, 6vw, 4.5rem);
+  box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.55);
+  mix-blend-mode: screen;
+}
+
+/* Dark letterforms act as the "windows" that let the discs show through. */
+.hero-content .hero-script,
+.hero-content .hero-title {
+  color: #101010;
+}
+
+.hero-content .hero-tagline {
+  color: #3a3a3a;
 }
 
 /* Handwritten-style accent line — the only script-font usage on the site */
