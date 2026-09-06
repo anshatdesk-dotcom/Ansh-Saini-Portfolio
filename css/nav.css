@@ -16,7 +16,7 @@
 /* Translucent + blurred once the hero has been scrolled past
    (class toggled by js/animations.js) */
 .site-header.nav-scrolled {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.45);
   border-bottom-color: var(--color-border-soft);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
