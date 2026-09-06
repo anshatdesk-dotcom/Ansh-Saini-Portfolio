@@ -1,3 +1,18 @@
+/* ==========================================================================
+   hero-tunnel.css — "Hyper Scroll" depth tunnel, full-page background layer
+
+   A viewport-fixed layer with CSS perspective holding a preserve-3d "world"
+   of tiny star dots and thin glass-style cards at negative Z depths.
+   js/hero-tunnel.js advances each element's Z with scroll (Lenis smooth
+   scroll) so stars/cards stream toward and past the viewer across the whole
+   page — behind the Hero, About, Projects, Resume and Contact sections.
+
+   Stacking: attached to <body> at z-index:-1, the layer paints above the
+   page's black canvas background and below every content element, so it
+   never intercepts clicks (pointer-events:none) or covers foreground UI.
+   Lenis (js/vendor/lenis.min.js) provides the smooth scroll.
+   ========================================================================== */
+
 /* Lenis drives the easing — neutralise the site's CSS smooth-scroll so the
    two never fight over every scrollTo. */
 html.lenis,
@@ -5,25 +20,10 @@ html.lenis-smooth {
   scroll-behavior: auto !important;
 }
 
-/* ==========================================================================
-   hero-tunnel.css — "Hyper Scroll" depth tunnel behind the Hero section
-
-   A viewport-fixed layer with CSS perspective that holds a preserve-3d
-   "world" of tiny star dots and thin glass-style cards at negative Z depths.
-   As the user scrolls through the hero, js/hero-tunnel.js pushes each
-   element toward (and past) the camera; a mouse tilt rotates the world; the
-   perspective widens slightly with scroll velocity for a subtle speed feel.
-
-   Stacking: the layer is fixed inside #home, so z-index:-1 paints it behind
-   the Three.js canvas (z:0) and the hero text content (z:1).
-   pointer-events:none throughout. Lenis (js/vendor/lenis.min.js) provides
-   the smooth scroll.
-   ========================================================================== */
-
-.hero-tunnel {
+.depth-tunnel {
   position: fixed;
   inset: 0;
-  z-index: -1; /* inside #home's isolated stacking context: behind everything */
+  z-index: -1; /* above the black page backdrop, below all content */
   pointer-events: none;
   overflow: hidden;
   perspective: 1100px; /* widened at speed by JS */
@@ -31,7 +31,7 @@ html.lenis-smooth {
   will-change: perspective;
 }
 
-.hero-tunnel-world {
+.depth-tunnel-world {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -42,7 +42,7 @@ html.lenis-smooth {
 }
 
 /* --- stars: tiny monochrome dots, matching the hero's particle field --- */
-.hero-tunnel-star {
+.depth-tunnel-star {
   position: absolute;
   left: 0;
   top: 0;
@@ -51,7 +51,7 @@ html.lenis-smooth {
 }
 
 /* --- cards: thin glass-style rectangles (dark fill, light border, blur) --- */
-.hero-tunnel-card {
+.depth-tunnel-card {
   position: absolute;
   left: 0;
   top: 0;
@@ -65,7 +65,7 @@ html.lenis-smooth {
 }
 
 /* faint placeholder lines inside cards (decor only, no real content) */
-.hero-tunnel-card::before {
+.depth-tunnel-card::before {
   content: "";
   position: absolute;
   left: 18%;
@@ -76,7 +76,7 @@ html.lenis-smooth {
   background: rgba(255, 255, 255, 0.14);
 }
 
-.hero-tunnel-card::after {
+.depth-tunnel-card::after {
   content: "";
   position: absolute;
   left: 18%;

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   hero-tunnel.js — "Hyper Scroll" 3D depth tunnel for the Hero section
+   hero-tunnel.js — "Hyper Scroll" 3D depth tunnel, full-page background
 
    Reference: "Hyper Scroll" CodePen by Aleksa Rakocevic (Lenis + pure CSS 3D
    transforms; no WebGL for this layer).
@@ -13,18 +13,24 @@
       reduced-motion; otherwise the site keeps its native / CSS-smooth
       behaviour.
 
-   2. Depth tunnel — a fixed, pointer-events:none perspective layer appended
-      inside #home at z-index:-1, i.e. behind the Three.js canvas (z:0) and
-      the hero text content (z:1). It holds small star dots and thin glass
-      cards, each parked at a world (x, y) and a negative Z depth. Scrolling advances every element's Z through a looped band
-      (deep → camera → past): the browser's CSS perspective shrinks deep
-      elements toward the screen centre and grows them as they approach, so
-      they stream toward and past the viewer. Each element fades in when it
-      is far away and fades out before it crosses the projection plane, then
-      wraps back to the deep end — a seamless, reversible stream. The world
-      tilts subtly with the mouse and the perspective widens a little with
-      scroll velocity. The whole layer fades out once the hero has scrolled
-      away, so the tunnel never leaks into later sections.
+   2. Depth tunnel — a fixed, pointer-events:none perspective layer attached
+      to <body> at z-index:-1, i.e. above the page's black backdrop and below
+      every section's content (Hero text, About's chrome sculpture, project
+      cards, Resume, Contact, the custom cursor). It holds star dots and thin
+      glass cards, each parked at a world (x, y) and a negative Z depth.
+
+      As the user scrolls the ENTIRE page, every element's Z advances through
+      a looped band (deep → camera → past): the browser's CSS perspective
+      shrinks deep elements toward the screen centre and grows them as they
+      approach, so they stream toward and past the viewer continuously at any
+      scroll position. Elements fade in when far away and fade out before
+      crossing the projection plane, then wrap back to the deep end — a
+      seamless, fully reversible stream for the full length of the page.
+
+      The world tilts subtly with the mouse and the perspective widens a
+      little with scroll velocity. Each element's Z is refreshed only while
+      the page is visible and being scrolled, keeping the frame cost low
+      alongside the hero's Three.js scene and the About chrome sculpture.
 
    Monochrome only — white/grey stars and dark glass cards with thin light
    borders. No scanlines, noise, or RGB-split effects.
@@ -32,9 +38,6 @@
 
 (() => {
   "use strict";
-
-  const hero = document.getElementById("home");
-  if (!hero) return;
 
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const noReducedMotion = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
@@ -45,7 +48,6 @@
      1. Lenis smooth scroll (site-wide easing)
      ===================================================================== */
   const html = document.documentElement;
-  const prevScrollBehavior = html.style.scrollBehavior;
   html.style.scrollBehavior = "auto"; // Lenis owns the easing now
 
   const lenis = new Lenis({
@@ -60,11 +62,9 @@
   });
 
   // Drive Lenis from GSAP's ticker when available so both share one loop.
-  let lenisTickerFn = null;
   if (window.gsap && gsap.ticker) {
     gsap.ticker.lagSmoothing(0);
-    lenisTickerFn = (time) => lenis.raf(time * 1000);
-    gsap.ticker.add(lenisTickerFn);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
   } else {
     const raf = (t) => {
       lenis.raf(t);
@@ -90,16 +90,16 @@
   });
 
   /* =====================================================================
-     2. Depth-tunnel world
+     2. Depth-tunnel world (full page)
      ===================================================================== */
   const viewport = document.createElement("div");
-  viewport.className = "hero-tunnel";
+  viewport.className = "depth-tunnel";
   viewport.setAttribute("aria-hidden", "true");
   viewport.setAttribute("role", "presentation");
-  hero.appendChild(viewport);
+  document.body.appendChild(viewport);
 
   const world = document.createElement("div");
-  world.className = "hero-tunnel-world";
+  world.className = "depth-tunnel-world";
   viewport.appendChild(world);
 
   const R = (min, max) => min + Math.random() * (max - min);
@@ -107,15 +107,17 @@
   /* Depth band. Camera sits at z:0; elements loop from Z_DEEP (small, far)
      toward the viewer and past it, wrapping back to Z_DEEP. Everything stays
      well clear of the projection plane so perspective never mirrors/clips.
-     (Visible fade completes by z≈+300; wrap happens at z=Z_TOP.) */
-  const Z_DEEP = -3600;
+     (Visible fade completes by z≈+300; wrap happens at z=Z_TOP.) The band is
+     long enough that a full lap takes ~1700px of scroll, so across the whole
+     page the stream never runs dry and never visibly repeats itself. */
+  const Z_DEEP = -8200;
   const Z_TOP = 650;
-  const SPAN = Z_TOP - Z_DEEP; // 4250 — one full loop
+  const SPAN = Z_TOP - Z_DEEP; // 8850 — one full loop
   const FOV_BASE = 1100;
+  const SPEED = 5; // world px advanced per scroll px
 
   const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-  // --- build one item ---------------------------------------------------
   const makeItem = (tag, cls, css) => {
     const el = document.createElement(tag);
     el.className = cls;
@@ -135,15 +137,15 @@
   const items = [];
 
   // --- stars: tiny monochrome dots -------------------------------------
-  const STAR_COUNT = isMobile ? 28 : 55;
+  const STAR_COUNT = isMobile ? 55 : 120;
   for (let i = 0; i < STAR_COUNT; i++) {
     const z0 = R(Z_DEEP + 60, -650); // deep start, nothing at rest near camera
     const s0 = projScale(z0, FOV_BASE);
-    const nx = R(-0.55, 0.55); // desired screen fraction at rest
+    const nx = R(-0.55, 0.55);
     const ny = R(-0.48, 0.48);
     const size = R(2, 5.5);
     const shade = Math.random();
-    const el = makeItem("span", "hero-tunnel-star", {
+    const el = makeItem("span", "depth-tunnel-star", {
       width: `${size.toFixed(1)}px`,
       height: `${size.toFixed(1)}px`,
       background: shade > 0.72 ? "#ffffff" : shade > 0.32 ? "#d5d5d5" : "#8f8f8f",
@@ -154,7 +156,7 @@
       el,
       nx,
       ny,
-      x0: (nx * window.innerWidth) / s0, // world px — rests at nx·vw via projection
+      x0: (nx * window.innerWidth) / s0,
       y0: (ny * window.innerHeight) / s0,
       z0,
       base: R(0.3, 0.9),
@@ -162,16 +164,16 @@
   }
 
   // --- cards: thin glass rectangles -------------------------------------
-  const cardCount = isMobile ? 4 : 6;
+  const cardCount = isMobile ? 6 : 9;
   for (let i = 0; i < cardCount; i++) {
     const t = cardCount === 1 ? 0 : i / (cardCount - 1);
-    const z0 = Z_DEEP + 250 + t * (2900 - 250); // -3350 .. -450
+    const z0 = Z_DEEP + 250 + t * (7800 - 250); // deep .. near (evenly spaced)
     const s0 = projScale(z0, FOV_BASE);
     const w = R(90, 175);
     const h = R(46, 92);
     const nx = R(-0.5, 0.5);
     const ny = R(-0.38, 0.38);
-    const el = makeItem("div", "hero-tunnel-card", {
+    const el = makeItem("div", "depth-tunnel-card", {
       width: `${w.toFixed(0)}px`,
       height: `${h.toFixed(0)}px`,
       marginLeft: `${(-w / 2).toFixed(0)}px`,
@@ -198,69 +200,48 @@
       it.y0 = (it.ny * window.innerHeight) / s0;
     }
   };
-
-  /* =====================================================================
-     3. Input state
-     ===================================================================== */
-  let mx = 0;
-  let my = 0;
-  let mxT = 0;
-  let myT = 0;
-  let overHero = false;
-
-  hero.addEventListener("pointermove", (e) => {
-    mxT = (e.clientX / window.innerWidth) * 2 - 1;
-    myT = (e.clientY / window.innerHeight) * 2 - 1;
-  });
-  hero.addEventListener("pointerenter", () => {
-    overHero = true;
-  });
-  hero.addEventListener("pointerleave", () => {
-    overHero = false;
-  });
-
-  // Hide the tunnel once the hero has left the viewport entirely.
-  let heroOnScreen = true;
-  if ("IntersectionObserver" in window) {
-    new IntersectionObserver((entries) => {
-      heroOnScreen = entries[0].isIntersecting;
-    }).observe(hero);
-  }
-
   window.addEventListener("resize", reanchor);
   reanchor();
 
   /* =====================================================================
+     3. Input state
+     ===================================================================== */
+  let mx = 0; // eased cursor position, -1..1 (right/down positive)
+  let my = 0;
+  let mxT = 0;
+  let myT = 0;
+
+  window.addEventListener("pointermove", (e) => {
+    mxT = (e.clientX / window.innerWidth) * 2 - 1;
+    myT = (e.clientY / window.innerHeight) * 2 - 1;
+  });
+
+  // Pause per-element Z updates while the page is hidden or the tab is
+  // backgrounded — the rAF loop also stops on its own, this saves style work.
+  let pageVisible = !document.hidden;
+  document.addEventListener("visibilitychange", () => {
+    pageVisible = !document.hidden;
+  });
+
+  /* =====================================================================
      4. Per-frame update
      ===================================================================== */
-  const SPEED = 5; // world px advanced per scroll px
-
   const frame = () => {
-    const svh = Math.max(hero.clientHeight || window.innerHeight, 1);
     const scroll = lenis.scroll || 0;
     const velocity = lenis.velocity || 0;
-
-    // Layer fades out as the hero scrolls away (p: 0 = hero fills viewport).
-    const p = Math.min(scroll / (svh * 0.9), 1.05);
-    const fadeT = Math.max(0, (p - 0.78) / 0.2);
-    const wrapperFade = fadeT >= 1 ? 0 : 1 - Math.pow(fadeT, 1.6);
 
     // Subtle speed feel: widen perspective with |scroll velocity|.
     const fov = FOV_BASE + Math.min(Math.abs(velocity) * 7, 320);
     viewport.style.perspective = fov + "px";
 
-    // Mouse tilt (lerped, only meaningful while the pointer is over the hero).
-    mx += ((overHero ? mxT : 0) - mx) * 0.06;
-    my += ((overHero ? myT : 0) - my) * 0.06;
+    // Mouse tilt (lerped) — the whole world leans slightly with the pointer.
+    mx += (mxT - mx) * 0.08;
+    my += (myT - my) * 0.08;
     const rotY = mx * 5;
     const rotX = -my * 3.5;
     world.style.transform = `rotateX(${rotX.toFixed(3)}deg) rotateY(${rotY.toFixed(3)}deg)`;
 
-    if (wrapperFade <= 0.001 || !heroOnScreen) {
-      if (viewport.style.opacity !== "0") viewport.style.opacity = "0";
-      return;
-    }
-    viewport.style.opacity = wrapperFade.toFixed(3);
+    if (!pageVisible || document.hidden) return;
 
     const advance = scroll * SPEED; // grows monotonically with scroll
 
@@ -273,7 +254,7 @@
       //  - near: fully in until z≈-150, gone by z≈+300 (before the plane)
       const fFar = Math.max(0, Math.min(1, (z - Z_DEEP) / 340));
       const fNear = Math.max(0, Math.min(1, (300 - z) / 450));
-      let op = wrapperFade * it.base * fFar * fNear;
+      let op = it.base * fFar * fNear;
       if (op > 1) op = 1;
       if (op < 0) op = 0;
 
