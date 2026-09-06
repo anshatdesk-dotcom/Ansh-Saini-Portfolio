@@ -85,6 +85,7 @@
   // --- Hover state: scale big ball on interactive elements ---
   const INTERACTIVE_SELECTOR = [
     "a",
+    "p",
     "button",
     "input",
     "textarea",
@@ -96,6 +97,7 @@
     ".project-card",
     ".project-link",
     ".scroll-indicator",
+   ".section-title",
     ".nav-toggle",
     ".chip",
     ".hero-title",
