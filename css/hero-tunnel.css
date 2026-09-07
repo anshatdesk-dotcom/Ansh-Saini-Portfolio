@@ -1,16 +1,14 @@
 /* ==========================================================================
    hero-tunnel.css — "Hyper Scroll" depth tunnel, full-page background layer
 
-   A viewport-fixed layer with CSS perspective holding a preserve-3d "world"
-   of star dots at negative Z depths. js/hero-tunnel.js advances each
-   element's Z with scroll (Lenis smooth scroll) so stars stream toward and
-   past the viewer across the whole page — behind the Hero, About, Projects,
-   Resume and Contact sections. A sibling Three.js canvas (.depth-gl, same
-   file) renders planets and asteroids riding the same scroll loop.
+   A fixed, pointer-events:none Three.js canvas (.depth-gl) renders a field
+   of soft glowing star points that stream toward the viewer as the user
+   scrolls, plus a few independently floating glow orbs for ambient
+   atmosphere (js/hero-tunnel.js, Lenis smooth scroll drives the Z advance).
 
    Stacking: attached to <body> at z-index:-1, the layer paints above the
-   page's black canvas background and below every content element;
-   pointer-events:none so it never intercepts clicks. Lenis
+   page's black canvas background and below every content element; it never
+   intercepts clicks (pointer-events:none). Lenis
    (js/vendor/lenis.min.js) provides the smooth scroll.
    ========================================================================== */
 
@@ -21,46 +19,15 @@ html.lenis-smooth {
   scroll-behavior: auto !important;
 }
 
-.depth-tunnel {
-  position: fixed;
-  inset: 0;
-  z-index: -1; /* above the black page backdrop, below all content */
-  pointer-events: none;
-  overflow: hidden;
-  perspective: 1100px; /* widened at speed by JS */
-  perspective-origin: 50% 50%;
-  will-change: perspective;
-}
-
-.depth-tunnel-world {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-/* --- stars: tiny monochrome dots, sized by depth in JS --------------- */
-.depth-tunnel-star {
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 50%;
-  will-change: transform, opacity;
-}
-
-/* --- Three.js planets/asteroids layer (rendered by hero-tunnel.js) ---
-   Fixed transparent canvas BEHIND the CSS star layer, same stacking rules. */
+/* --- Three.js glowy star field + floating orbs (rendered by hero-tunnel.js) */
 .depth-gl {
   position: fixed;
   inset: 0;
-  z-index: -2; /* behind the CSS star layer (-1), above the black backdrop */
+  z-index: -1; /* above the black page backdrop, below all content */
   pointer-events: none;
 }
 .depth-gl canvas {
   display: block;
   width: 100%;
   height: 100%;
-}
+}
