@@ -32,6 +32,7 @@
 *::after {
   box-sizing: border-box;
   scrollbar-width:none;
+  user-select: none;
 }
 
 * {

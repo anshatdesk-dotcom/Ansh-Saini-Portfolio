@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/footer.css" />
   <link rel="stylesheet" href="css/cursor.css" />
   <link rel="stylesheet" href="css/hero-tunnel.css" />
+  <link rel="stylesheet" href="css/admin.css" />
 
   <script src="js/main.js" defer></script>
 </head>
@@ -370,7 +371,110 @@
   <script src="js/hero-typewriter.js"></script>
   <!-- Custom glowing cursor (must be last: needs full DOM + no deps) -->
   <script src="js/cursor.js"></script>
+  <!-- ============ HIDDEN ADMIN (no visible hint on the public site) ============ -->
+  <!-- Rendered before the backend scripts below so js/admin.js can find it. -->
+  <!-- Reachable only by clicking the "AS" logo 3 times within 2 seconds. -->
+  <div class="admin-overlay" id="adminOverlay" hidden>
+    <!-- View 1: login (Email + Password, Supabase Auth) -->
+    <div class="admin-modal" id="adminLogin" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle" hidden>
+      <h3 id="adminLoginTitle">Admin</h3>
+      <form id="adminLoginForm" novalidate>
+        <div class="form-field">
+          <label for="adminEmail">Email</label>
+          <input type="email" id="adminEmail" name="email" autocomplete="username" required />
+        </div>
+        <div class="form-field">
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" name="password" autocomplete="current-password" required />
+        </div>
+        <p class="form-status admin-error" id="adminLoginError" role="alert"></p>
+        <button class="btn" type="submit">Log In</button>
+      </form>
+    </div>
+
+    <!-- View 2: admin panel (rendered ONLY after a valid Supabase session) -->
+    <div class="admin-panel" id="adminPanel" role="dialog" aria-modal="true" aria-labelledby="adminPanelTitle" hidden>
+      <div class="admin-panel-head">
+        <h3 id="adminPanelTitle">Admin Panel</h3>
+        <button class="admin-close" id="adminLogout" type="button">Log Out</button>
+      </div>
+
+      <section class="admin-section">
+        <h4>Messages</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>Date Received</th>
+              </tr>
+            </thead>
+            <tbody id="adminMessagesBody"></tbody>
+          </table>
+        </div>
+        <p class="admin-empty" id="adminMessagesEmpty" hidden>No messages yet.</p>
+        <p class="form-status" id="adminMessagesStatus" role="status"></p>
+      </section>
+
+      <section class="admin-section">
+        <h4>Projects in database</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Tech</th>
+                <th>Date Added</th>
+              </tr>
+            </thead>
+            <tbody id="adminProjectsBody"></tbody>
+          </table>
+        </div>
+        <p class="admin-empty" id="adminProjectsEmpty" hidden>No projects in the database yet.</p>
+        <p class="form-status" id="adminProjectsStatus" role="status"></p>
+      </section>
+
+      <section class="admin-section">
+        <h4>Add Project</h4>
+        <form id="adminProjectForm" class="admin-project-form" novalidate>
+          <div class="form-field">
+            <label for="projTitle">Title</label>
+            <input type="text" id="projTitle" name="title" required />
+          </div>
+          <div class="form-field">
+            <label for="projDesc">Description</label>
+            <textarea id="projDesc" name="description" rows="3"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="projTags">Tech tags (comma-separated)</label>
+            <input type="text" id="projTags" name="tech_tags" placeholder="React, CSS, JavaScript" />
+          </div>
+          <div class="form-field">
+            <label for="projLink">Project link</label>
+            <input type="url" id="projLink" name="link" placeholder="https://..." />
+          </div>
+          <div class="form-field">
+            <label for="projImage">Image URL</label>
+            <input type="url" id="projImage" name="image_url" placeholder="https://..." />
+          </div>
+          <button class="btn" type="submit">Add Project</button>
+          <p class="form-status" id="adminProjectStatus" role="status"></p>
+        </form>
+      </section>
+    </div>
+  </div>
+
   <!-- Hyper-scroll depth tunnel + Lenis smooth scroll (depends on Lenis) -->
   <script src="js/hero-tunnel.js"></script>
+  <!-- Supabase backend: client (UMD build of @supabase/supabase-js), public
+       credentials, hidden admin access, and dynamic Projects fetch.
+       Credentials are read from js/supabase-config.js. -->
+  <script src="js/vendor/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/projects.js"></script>
 </body>
 </html>

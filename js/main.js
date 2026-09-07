@@ -103,15 +103,45 @@
 
   spySections.forEach((section) => spyObserver.observe(section));
 
-  /* ---------- 3. Contact form (placeholder behaviour) ---------- */
+  /* ---------- 3. Contact form (Supabase-backed) ----------
+     When Supabase is configured (js/supabase-config.js), submissions are
+     inserted into the "messages" table and can be read from the hidden
+     admin panel. Without configuration, the old placeholder behaviour
+     stays so the form never breaks. */
 
   const form = document.getElementById("contactForm");
   const formStatus = document.getElementById("formStatus");
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    formStatus.textContent =
-      "Thanks! This form isn't connected to anything yet — the handler will be added in a later step.";
+
+    const supabase = window.__supabaseClient || null;
+    if (!supabase) {
+      formStatus.textContent =
+        "Thanks! This form isn't connected to anything yet — the handler will be added in a later step.";
+      form.reset();
+      return;
+    }
+
+    const name = document.getElementById("formName").value.trim();
+    const email = document.getElementById("formEmail").value.trim();
+    const message = document.getElementById("formMessage").value.trim();
+
+    formStatus.textContent = "Sending…";
+
+    const { error } = await supabase.from("messages").insert({
+      name,
+      email,
+      message,
+    });
+
+    if (error) {
+      formStatus.textContent =
+        "Something went wrong sending your message. Please try again later.";
+      return;
+    }
+
+    formStatus.textContent = "Thanks! Your message has been sent.";
     form.reset();
   });
 })();

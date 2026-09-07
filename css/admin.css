@@ -1,0 +1,169 @@
+/* ==========================================================================
+   admin.css — hidden admin overlay (login + panel)
+   Monochrome theme matching the rest of the site. The overlay only ever
+   becomes visible via the logo triple-click (or an active session), so
+   nothing here is shown to normal visitors.
+   ========================================================================== */
+
+.admin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000; /* above everything incl. the custom cursor layer (z 1000) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(6px);
+}
+
+.admin-overlay[hidden] {
+  display: none;
+}
+
+/* ---------- Login modal ---------- */
+
+.admin-modal {
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.875rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-modal h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.admin-modal .btn {
+  align-self: flex-start;
+}
+
+.admin-error {
+  color: #ff8f8f; /* subtle red only inside the hidden admin overlay */
+  font-weight: 400;
+  min-height: 1.2em;
+}
+
+/* ---------- Admin panel ---------- */
+
+.admin-panel {
+  width: 100%;
+  max-width: 860px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.875rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.admin-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-panel-head h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.admin-close {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 0.45rem 1rem;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-close:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-body);
+}
+
+.admin-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-body);
+}
+
+/* ---------- Messages table ---------- */
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--color-border-soft);
+  vertical-align: top;
+}
+
+.admin-table th {
+  font-weight: 500;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table td.admin-date {
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.admin-empty {
+  font-weight: 300;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Add project form ---------- */
+
+.admin-project-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.admin-project-form .btn {
+  justify-self: start;
+}
+
+@media (min-width: 640px) {
+  .admin-project-form {
+    grid-template-columns: 1fr 1fr;
+  }
+  .admin-project-form .form-field--full {
+    grid-column: 1 / -1;
+  }
+}
