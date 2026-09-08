@@ -10,8 +10,10 @@
   inset: 0;
   z-index: 9000; /* above everything incl. the custom cursor layer (z 1000) */
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* The overlay itself can scroll when a view is taller than the viewport;
+     the views use margin: auto so they stay centered when small but their
+     top is never cut off (flex align-items: center would hide it). */
+  overflow-y: auto;
   padding: 1.5rem;
   background-color: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(6px);
@@ -23,9 +25,19 @@
 
 /* ---------- Login modal ---------- */
 
+/* The two views start [hidden] in the markup. An author rule that sets
+   display (flex below) would otherwise override the hidden attribute, so
+   both views need an explicit [hidden] rule — this is what guarantees only
+   one view is ever visible at a time. */
+.admin-modal[hidden],
+.admin-panel[hidden] {
+  display: none;
+}
+
 .admin-modal {
   width: 100%;
   max-width: 380px;
+  margin: auto; /* safe centering inside the scrollable overlay */
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0.875rem;
@@ -35,9 +47,36 @@
   gap: 1.25rem;
 }
 
+.admin-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .admin-modal h3 {
   font-size: 1.3rem;
   font-weight: 600;
+}
+
+.admin-modal-close {
+  font-size: 1.3rem;
+  line-height: 1;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-modal-close:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-body);
 }
 
 .admin-modal .btn {
@@ -55,8 +94,14 @@
 .admin-panel {
   width: 100%;
   max-width: 860px;
-  max-height: 88vh;
+  max-height: 85vh;
   overflow-y: auto;
+  /* Scrolling inside the panel must never chain to the page behind it. */
+  overscroll-behavior: contain;
+  /* Visible dark scrollbar — overrides the site-wide scrollbar-width:none. */
+  scrollbar-width: thin;
+  scrollbar-color: #4a4a4a #161616;
+  margin: auto; /* safe centering inside the scrollable overlay */
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0.875rem;
@@ -64,6 +109,23 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+}
+
+.admin-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-panel::-webkit-scrollbar-track {
+  background: #161616;
+}
+
+.admin-panel::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+.admin-panel::-webkit-scrollbar-thumb:hover {
+  background: #6a6a6a;
 }
 
 .admin-panel-head {

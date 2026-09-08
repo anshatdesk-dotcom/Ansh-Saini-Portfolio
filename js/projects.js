@@ -6,16 +6,17 @@
    configured, the fetch fails, or the table is empty, the static placeholder
    cards already in index.html stay untouched, so the section never appears
    empty.
+
+   Exposes window.__refreshPublicProjects() so the admin panel can re-fetch
+   the section immediately after adding a project (no page reload needed).
    ========================================================================== */
 
 (() => {
   "use strict";
 
   const supabase = window.__supabaseClient || null;
-  if (!supabase) return;
-
   const grid = document.querySelector(".project-grid");
-  if (!grid) return;
+  if (!supabase || !grid) return;
 
   const escapeHtml = (str) =>
     String(str ?? "")
@@ -52,19 +53,25 @@
       </article>`;
   };
 
-  (async () => {
+  // Fetch from Supabase and replace the grid. Any failure (network, RLS not
+  // set up, table missing) keeps the existing cards untouched, so the
+  // section never appears empty.
+  const refresh = async () => {
     try {
       const { data, error } = await supabase
         .from("projects")
         .select("*")
         .order("created_at", { ascending: false });
 
-      // Any failure (network, RLS not set up, table missing) → keep placeholders.
       if (error || !data || data.length === 0) return;
 
       grid.innerHTML = data.map(buildCard).join("");
     } catch (_err) {
       // Keep the static placeholders on any unexpected error.
     }
-  })();
+  };
+
+  window.__refreshPublicProjects = refresh;
+
+  refresh();
 })();

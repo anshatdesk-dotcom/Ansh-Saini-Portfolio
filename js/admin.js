@@ -30,7 +30,11 @@
 
   const showOverlay = () => {
     $("adminOverlay").hidden = false;
+    // Lock the page behind the overlay (scroll must happen inside the panel).
     document.body.style.overflow = "hidden";
+    // Stop Lenis smooth scroll so wheel input reaches the panel's own
+    // scrollbar instead of being swallowed trying to scroll the locked page.
+    if (window.__lenis) window.__lenis.stop();
   };
 
   const hideOverlay = () => {
@@ -39,6 +43,7 @@
     $("adminLogin").hidden = true;
     $("adminPanel").hidden = true;
     document.body.style.overflow = "";
+    if (window.__lenis) window.__lenis.start();
   };
 
   // Exactly one view visible: "login" or "panel". Never both, never none.
@@ -76,10 +81,12 @@
     });
   });
 
-  // Escape closes the overlay.
+  // Escape or the close button dismisses the overlay without logging in.
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !$("adminOverlay").hidden) hideOverlay();
   });
+
+  $("adminLoginClose").addEventListener("click", hideOverlay);
 
   /* ---------- Login: supabase.auth.signInWithPassword ---------- */
 
@@ -262,13 +269,19 @@
 
     status.textContent = "Project added.";
     $("adminProjectForm").reset();
-    loadProjects(); // refresh the projects table
+    loadProjects(); // refresh the dashboard projects table
+    // Refresh the public Projects section on the live site immediately.
+    if (typeof window.__refreshPublicProjects === "function") {
+      window.__refreshPublicProjects();
+    }
   });
 
   /* ---------- Log out ---------- */
 
-  $("adminLogout").addEventListener("click", async () => {
-    if (supabase) await supabase.auth.signOut();
+  $("adminLogout").addEventListener("click", () => {
+    // Fire-and-forget: close the overlay immediately rather than waiting for
+    // the sign-out network round-trip to finish first.
+    if (supabase) supabase.auth.signOut();
     hideOverlay();
   });
 

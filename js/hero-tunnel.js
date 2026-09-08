@@ -59,6 +59,10 @@
     wheelMultiplier: 1,
   });
 
+  // Expose for the admin overlay (js/admin.js), which stops Lenis while its
+  // scrollable panel is open so wheel input scrolls the panel, not the page.
+  window.__lenis = lenis;
+
   // Keep GSAP ScrollTrigger (section reveals, nav state) in sync.
   lenis.on("scroll", () => {
     if (window.ScrollTrigger) ScrollTrigger.update();
