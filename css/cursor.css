@@ -9,12 +9,14 @@ body.glow-cursor-active * {
   cursor: none !important;
 }
 
-/* Shared ball styles */
+/* Shared ball styles — z-index above EVERYTHING (incl. the admin overlay at
+   9000 and the depth-tunnel/canvas layers) so the cursor never disappears
+   behind a modal. */
 .cursor-ball {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 10000;
   pointer-events: none;
   border-radius: 50%;
   mix-blend-mode: difference;

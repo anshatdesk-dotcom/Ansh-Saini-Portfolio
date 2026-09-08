@@ -40,6 +40,15 @@
   font-weight: 300;
 }
 
+/* Real image thumbnail (dynamic cards from the projects table) */
+.project-thumb-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background-color: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+
 .project-card-body {
   display: flex;
   flex-direction: column;
