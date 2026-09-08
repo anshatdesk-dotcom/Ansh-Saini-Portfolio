@@ -34,7 +34,10 @@
     document.body.style.overflow = "hidden";
     // Stop Lenis smooth scroll so wheel input reaches the panel's own
     // scrollbar instead of being swallowed trying to scroll the locked page.
-    if (window.__lenis) window.__lenis.stop();
+    if (window.__lenis) {
+      window.__lenis.stop();
+      window.__lenis.smoothWheel = false;
+    }
   };
 
   const hideOverlay = () => {
@@ -43,7 +46,10 @@
     $("adminLogin").hidden = true;
     $("adminPanel").hidden = true;
     document.body.style.overflow = "";
-    if (window.__lenis) window.__lenis.start();
+    if (window.__lenis) {
+      window.__lenis.smoothWheel = true;
+      window.__lenis.start();
+    }
   };
 
   // Exactly one view visible: "login" or "panel". Never both, never none.
@@ -52,6 +58,21 @@
     $("adminPanel").hidden = view !== "panel";
     showOverlay();
   };
+
+  /* ---------- Wheel scroll inside panel — stop propagation before Lenis captures it ---------- */
+
+  const panel = $("adminPanel");
+  if (panel) {
+    panel.addEventListener(
+      "wheel",
+      (e) => {
+        // Let the panel's own overflow-y scroll handle this event;
+        // prevent it from bubbling up to Lenis / the tunnel layer.
+        e.stopPropagation();
+      },
+      { passive: true }
+    );
+  }
 
   /* ---------- Logo triple-click detector (always active) ---------- */
 
@@ -87,6 +108,20 @@
   });
 
   $("adminLoginClose").addEventListener("click", hideOverlay);
+
+  /* ---------- Validation helpers ---------- */
+
+  const validateField = (input, errorEl, message) => {
+    const val = input.value.trim();
+    if (!val) {
+      input.classList.add("admin-input-error");
+      errorEl.textContent = message;
+      return false;
+    }
+    input.classList.remove("admin-input-error");
+    errorEl.textContent = "";
+    return true;
+  };
 
   /* ---------- Login: supabase.auth.signInWithPassword ---------- */
 
@@ -153,7 +188,7 @@
 
     const { data, error } = await supabase
       .from("messages")
-      .select("name, email, message, created_at")
+      .select("id, name, email, message, created_at")
       .order("created_at", { ascending: false });
 
     status.textContent = "";
@@ -200,7 +235,7 @@
 
     const { data, error } = await supabase
       .from("projects")
-      .select("title, description, tech_tags, created_at")
+      .select("id, title, description, tech_tags, created_at")
       .order("created_at", { ascending: false });
 
     status.textContent = "";
@@ -219,14 +254,51 @@
     body.innerHTML = data
       .map(
         (row) => `
-          <tr>
+          <tr data-id="${escapeHtml(row.id)}">
             <td>${escapeHtml(row.title)}</td>
             <td>${escapeHtml(row.description || "")}</td>
             <td>${escapeHtml((row.tech_tags || []).join(", "))}</td>
             <td class="admin-date">${escapeHtml(formatDate(row.created_at))}</td>
+            <td class="admin-actions">
+              <button class="admin-delete-btn" type="button" data-id="${escapeHtml(row.id)}" data-title="${escapeHtml(row.title)}" aria-label="Delete project: ${escapeHtml(row.title)}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </td>
           </tr>`
       )
       .join("");
+
+    // Wire delete buttons
+    body.querySelectorAll(".admin-delete-btn").forEach((btn) => {
+      btn.addEventListener("click", () => deleteProject(btn.dataset.id, btn.dataset.title));
+    });
+  };
+
+  /* ---------- Admin panel: delete project ---------- */
+
+  const deleteProject = async (id, title) => {
+    if (!supabase) return;
+
+    const confirmed = window.confirm(`Delete project "${title}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    const status = $("adminProjectsStatus");
+    status.textContent = "Deleting…";
+
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+
+    if (error) {
+      status.textContent =
+        "Could not delete project: " + (error.message || "unknown error");
+      return;
+    }
+
+    status.textContent = "Project deleted.";
+    loadProjects();
+    // Refresh the public Projects section on the live site immediately.
+    if (typeof window.__refreshPublicProjects === "function") {
+      window.__refreshPublicProjects();
+    }
   };
 
   /* ---------- Admin panel: add project (authenticated insert via RLS) ---------- */
@@ -240,10 +312,24 @@
       return;
     }
 
+    // Validate required fields
+    const titleInput = $("projTitle");
+    const descInput = $("projDesc");
+    const titleError = $("projTitleError");
+    const descError = $("projDescError");
+
+    const titleValid = validateField(titleInput, titleError, "Title is required.");
+    const descValid = validateField(descInput, descError, "Description is required.");
+
+    if (!titleValid || !descValid) {
+      status.textContent = "";
+      return;
+    }
+
     status.textContent = "Adding…";
 
-    const title = $("projTitle").value.trim();
-    const description = $("projDesc").value.trim();
+    const title = titleInput.value.trim();
+    const description = descInput.value.trim();
     const tagsRaw = $("projTags").value.trim();
     const link = $("projLink").value.trim();
     const imageUrl = $("projImage").value.trim();

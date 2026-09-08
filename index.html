@@ -431,6 +431,7 @@
                 <th>Description</th>
                 <th>Tech</th>
                 <th>Date Added</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="adminProjectsBody"></tbody>
@@ -446,10 +447,12 @@
           <div class="form-field">
             <label for="projTitle">Title</label>
             <input type="text" id="projTitle" name="title" required />
+            <p class="admin-field-error" id="projTitleError"></p>
           </div>
           <div class="form-field">
             <label for="projDesc">Description</label>
             <textarea id="projDesc" name="description" rows="3"></textarea>
+            <p class="admin-field-error" id="projDescError"></p>
           </div>
           <div class="form-field">
             <label for="projTags">Tech tags (comma-separated)</label>
