@@ -66,6 +66,11 @@
       if (error || !data || data.length === 0) return;
 
       grid.innerHTML = data.map(buildCard).join("");
+      // Re-wrap the freshly rendered cards into the carousel's coverflow
+      // structure (defined in js/projects-carousel.js).
+      if (typeof window.__carouselRebuild === "function") {
+        window.__carouselRebuild();
+      }
     } catch (_err) {
       // Keep the static placeholders on any unexpected error.
     }

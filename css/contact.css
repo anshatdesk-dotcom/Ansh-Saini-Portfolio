@@ -68,6 +68,104 @@
   color: var(--color-text-muted);
 }
 
+.form-status.form-status-error {
+  color: #ff8f8f;
+}
+
+.field-error {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #ff8f8f;
+  min-height: 1em;
+}
+
+.form-field input.input-error,
+.form-field textarea.input-error {
+  border-color: #ff8f8f;
+}
+
+/* ---------- OTP verification step ---------- */
+
+.form-otp[hidden] {
+  display: none;
+}
+
+.form-otp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+}
+
+.form-otp label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-body);
+}
+
+.form-otp-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-otp-inline input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 1rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  color: var(--color-text);
+  letter-spacing: 0.4em;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.form-otp-inline input:focus {
+  outline: none;
+  border-color: var(--color-focus);
+}
+
+.form-otp-inline .btn {
+  padding: 0.8rem 1.4rem;
+  white-space: nowrap;
+}
+
+.form-hint {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--color-text-muted);
+}
+
+.form-hint strong {
+  font-weight: 400;
+  color: var(--color-text);
+  word-break: break-all;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.link-btn:disabled {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  cursor: default;
+}
+
 /* Name + email side by side once there is room */
 @media (min-width: 1024px) {
   .form-row {
