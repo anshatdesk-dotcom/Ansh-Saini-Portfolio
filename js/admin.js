@@ -26,6 +26,25 @@
   // Shared client from js/supabase-config.js — null when keys are blank.
   const supabase = window.__supabaseClient || null;
 
+  // Only this email may use the admin panel. Visitors who verify a contact-
+  // form OTP get an authenticated session — they must NOT unlock the panel.
+  const ADMIN_EMAIL = (window.ADMIN_EMAIL || "").toLowerCase();
+  const isAdminSession = (session) =>
+    !!session &&
+    !!ADMIN_EMAIL &&
+    (session.user?.email || "").toLowerCase() === ADMIN_EMAIL;
+
+  // The panel opens ONLY for a session the owner created by logging in with
+  // their password through the hidden modal. The contact form's OTP flow also
+  // creates a (brief) authenticated session — if that email happens to be the
+  // admin's own, isAdminSession alone would wrongly unlock the panel. This
+  // flag marks an *intentional* admin login, so OTP sessions can never do it.
+  const ADMIN_AUTHED_KEY = "fb_admin_authed";
+  const markAdminAuthed = () => localStorage.setItem(ADMIN_AUTHED_KEY, "1");
+  const clearAdminAuthed = () => localStorage.removeItem(ADMIN_AUTHED_KEY);
+  const isAdminAuthed = (session) =>
+    isAdminSession(session) && localStorage.getItem(ADMIN_AUTHED_KEY) === "1";
+
   /* ---------- Strict one-view gate ---------- */
 
   const showOverlay = () => {
@@ -88,10 +107,11 @@
       clickTimes.push(now);
       if (clickTimes.length >= REQUIRED_CLICKS) {
         clickTimes = [];
-        // Never open the login over a live session; go straight to the panel.
+        // Only a flagged admin login goes straight to the panel; anything
+        // else (or a visitor's OTP session) shows the login modal.
         if (supabase && supabase.auth.getSession) {
           supabase.auth.getSession().then(({ data }) => {
-            if (data.session) showView("panel");
+            if (isAdminAuthed(data.session)) showView("panel");
             else showView("login");
           });
         } else {
@@ -149,7 +169,18 @@
       return;
     }
 
-    // Valid session received from Supabase — and only now show the panel.
+    // Only the configured admin email may enter. Anything else is treated
+    // exactly like a wrong password (and the stray session is dropped).
+    if (!isAdminSession(data.session)) {
+      supabase.auth.signOut();
+      $("adminLoginError").textContent = "Invalid email or password";
+      return;
+    }
+
+    // Valid admin session received from Supabase — only now show the panel.
+    // Mark it as an intentional admin login so session restore (page reloads)
+    // knows to reopen the panel — and so OTP sessions never can.
+    markAdminAuthed();
     $("adminLoginForm").reset();
     showView("panel");
     loadMessages();
@@ -368,25 +399,21 @@
     // Fire-and-forget: close the overlay immediately rather than waiting for
     // the sign-out network round-trip to finish first.
     if (supabase) supabase.auth.signOut();
+    clearAdminAuthed();
     hideOverlay();
   });
 
   /* ---------- Session restore ---------- */
 
-  // If a Supabase session already exists (page reload while logged in), the
-  // panel is reachable directly; otherwise only the login view ever exists.
+  // After a page reload while still logged in as admin (the login flag above
+  // is set), the panel reopens directly. There is deliberately NO auth-state
+  // listener here: the contact form's OTP verification also fires a SIGNED_IN
+  // event with the admin's own email, and listening to it would yank the
+  // visitor into the admin dashboard mid-form. Only the explicit password
+  // login (which sets the flag) or a flagged restore may open the panel.
   if (supabase) {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        showView("panel");
-        loadMessages();
-        loadProjects();
-      }
-    });
-
-    // Keep the gate honest across tabs / sign-out.
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
+      if (isAdminAuthed(data.session)) {
         showView("panel");
         loadMessages();
         loadProjects();

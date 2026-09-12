@@ -3,6 +3,129 @@
    Mobile-first: columns stack; two columns side-by-side >= 768px.
    ========================================================================== */
 
+/* ---------- Floating tech-stack playground (js/resume-physics.js) ---------- */
+
+/* The section is the containing block for the physics layer. The layer sits
+   behind the content (z-index 0 vs 1) so headings, chips and the Download
+   Resume button stay readable, and it never receives pointer events — the
+   proximity force is driven from a window-level mousemove instead, which is
+   what keeps buttons and links clickable straight through it. */
+.resume {
+  position: relative;
+  overflow: hidden; /* walls keep the balls in; this clips any overshoot */
+}
+
+.resume > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.resume-physics {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The trail canvas holds every ball's motion wake and sits behind them. */
+.resume-physics-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Each orb is lit in its own technology's brand colour (`--brand-rgb`, set
+   from JS): a brand-tinted rim, a pool of brand light in the lower right, a
+   glass glint at the top left, and a dark core so the colour reads against the
+   section. The result is a lit marble rather than a dead grey outline. */
+.tech-ball {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; /* above the trail canvas */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid rgba(var(--brand-rgb, 255, 255, 255), 0.55);
+  border-radius: 50%;
+  background-image:
+    radial-gradient(
+      circle at 32% 26%,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0) 45%
+    ),
+    radial-gradient(
+      circle at 70% 78%,
+      rgba(var(--brand-rgb, 255, 255, 255), 0.42),
+      rgba(var(--brand-rgb, 255, 255, 255), 0) 70%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(14, 14, 16, 0.75),
+      rgba(5, 5, 7, 0.92)
+    );
+  box-shadow:
+    0 0 22px -6px rgba(var(--brand-rgb, 255, 255, 255), 0.9),
+    inset 0 0 18px -8px rgba(var(--brand-rgb, 255, 255, 255), 0.95),
+    0 10px 24px rgba(0, 0, 0, 0.45);
+  will-change: transform; /* the loop writes transform every frame */
+}
+
+/* Specular glint, so the orb reads as a lit sphere rather than a flat disc.
+   It tumbles with the body, which is what a real lit ball would do. */
+.tech-ball::after {
+  content: "";
+  position: absolute;
+  top: 11%;
+  left: 17%;
+  width: 28%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0) 72%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.tech-ball-icon {
+  display: none;
+  width: 26px;
+  height: 26px;
+}
+
+/* The icons keep their original brand colours (Simple Icons serves each logo
+   in its own colour; VS Code comes from Devicon's multicolour build). The ball
+   behind them stays dark on purpose, so those colours read clearly. */
+
+/* The icon replaces the label only once it has actually loaded, so an
+   offline visit shows clean text rather than a broken image. */
+.tech-ball.has-icon .tech-ball-icon {
+  display: block;
+}
+
+.tech-ball.has-icon .tech-ball-label {
+  display: none;
+}
+
+.tech-ball-label {
+  padding: 0 6px;
+  font-family: var(--font-heading);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--color-text-body);
+  letter-spacing: 0.02em;
+}
+
 .resume-grid {
   display: grid;
   gap: 3rem;

@@ -103,45 +103,244 @@
 
   spySections.forEach((section) => spyObserver.observe(section));
 
-  /* ---------- 3. Contact form (Supabase-backed) ----------
-     When Supabase is configured (js/supabase-config.js), submissions are
-     inserted into the "messages" table and can be read from the hidden
-     admin panel. Without configuration, the old placeholder behaviour
-     stays so the form never breaks. */
+  /* ---------- 3. Contact form (Supabase-backed, OTP-verified) ----------
+     Flow:
+       1. The visitor fills Name / Email / Message and hits "Send Message".
+       2. Client-side validation rejects blank fields and bad emails.
+       3. Supabase Auth emails a 6-digit OTP to the address
+          (supabase.auth.signInWithOtp).
+       4. The visitor enters the code; supabase.auth.verifyOtp proves the
+          email belongs to them.
+       5. Only then is the message inserted — via the submit_message RPC,
+          which validates again server-side and rejects a second message
+          from the same email (one message per email).
+       6. The temporary OTP session is signed out immediately so visitors
+          are never left authenticated.
+
+     Without Supabase configured, the old placeholder behaviour stays so
+     the form never breaks. */
 
   const form = document.getElementById("contactForm");
   const formStatus = document.getElementById("formStatus");
+  const sendBtn = document.getElementById("formSendBtn");
+  const otpRow = document.getElementById("formOtpRow");
+  const otpInput = document.getElementById("formOtp");
+  const otpTarget = document.getElementById("formOtpTarget");
+  const verifyBtn = document.getElementById("formVerifyBtn");
+  const resendBtn = document.getElementById("formResendBtn");
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  let otpEmail = ""; // the address the current code was sent to
+  let resendCooldownUntil = 0;
+
+  const setStatus = (msg, isError = false) => {
+    formStatus.textContent = msg;
+    formStatus.classList.toggle("form-status-error", isError);
+  };
+
+  const setFieldError = (input, errorEl, message) => {
+    input.classList.toggle("input-error", Boolean(message));
+    errorEl.textContent = message || "";
+  };
+
+  const showOtpStep = (show) => {
+    otpRow.hidden = !show;
+    verifyBtn.disabled = false;
+    if (show) otpInput.focus();
+  };
+
+  // Cooldown on the "Resend code" button so Supabase's email rate limits
+  // (roughly one email per minute per address) are respected.
+  const armResendCooldown = () => {
+    resendCooldownUntil = Date.now() + 60000;
+    resendBtn.disabled = true;
+    const tick = () => {
+      const left = Math.max(0, Math.ceil((resendCooldownUntil - Date.now()) / 1000));
+      resendBtn.textContent = left > 0 ? `Resend code (${left}s)` : "Resend code";
+      resendBtn.disabled = left > 0;
+      if (left > 0) setTimeout(tick, 1000);
+    };
+    tick();
+  };
+
+  const sendOtp = async (email) => {
+    const supabase = window.__supabaseClient || null;
+    if (!supabase) return { error: { message: "Supabase is not configured." } };
+    // IMPORTANT: Your Supabase project must be configured to send OTP codes
+    // (not magic links). In the Supabase dashboard, go to:
+    //   Authentication → Email Templates → Confirm email
+    // Set "Confirm email" to "OTP" instead of "Magic Link".
+    // Otherwise this sends a magic link that creates a session.
+    return supabase.auth.signInWithOtp({ email });
+  };
+
+  /* --- Step 1: validate + send the OTP --- */
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const supabase = window.__supabaseClient || null;
     if (!supabase) {
-      formStatus.textContent =
-        "Thanks! This form isn't connected to anything yet — the handler will be added in a later step.";
+      setStatus(
+        "Thanks! This form isn't connected to anything yet — the handler will be added in a later step."
+      );
       form.reset();
       return;
     }
 
-    const name = document.getElementById("formName").value.trim();
-    const email = document.getElementById("formEmail").value.trim();
-    const message = document.getElementById("formMessage").value.trim();
+    const nameInput = document.getElementById("formName");
+    const emailInput = document.getElementById("formEmail");
+    const msgInput = document.getElementById("formMessage");
+    const nameError = document.getElementById("formNameError");
+    const emailError = document.getElementById("formEmailError");
+    const msgError = document.getElementById("formMessageError");
 
-    formStatus.textContent = "Sending…";
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const message = msgInput.value.trim();
 
-    const { error } = await supabase.from("messages").insert({
-      name,
-      email,
-      message,
-    });
+    // Client-side validation — the RPC re-checks all of this server-side.
+    let valid = true;
+    if (!name) {
+      setFieldError(nameInput, nameError, "Please enter your name.");
+      valid = false;
+    } else {
+      setFieldError(nameInput, nameError, "");
+    }
+    if (!email) {
+      setFieldError(emailInput, emailError, "Please enter your email.");
+      valid = false;
+    } else if (!EMAIL_RE.test(email)) {
+      setFieldError(emailInput, emailError, "That email doesn't look right.");
+      valid = false;
+    } else {
+      setFieldError(emailInput, emailError, "");
+    }
+    if (!message) {
+      setFieldError(msgInput, msgError, "Message cannot be empty.");
+      valid = false;
+    } else {
+      setFieldError(msgInput, msgError, "");
+    }
+    if (!valid) return;
+
+    // Send the verification code to the given address.
+    sendBtn.disabled = true;
+    setStatus(`Sending a verification code to ${email}…`);
+
+    const { error } = await sendOtp(email);
 
     if (error) {
-      formStatus.textContent =
-        "Something went wrong sending your message. Please try again later.";
+      sendBtn.disabled = false;
+      setStatus(
+        "Couldn't send the code: " + (error.message || "unknown error"),
+        true
+      );
       return;
     }
 
-    formStatus.textContent = "Thanks! Your message has been sent.";
+    otpEmail = email;
+    otpTarget.textContent = email;
+    otpInput.value = "";
+    showOtpStep(true);
+    sendBtn.textContent = "Change email";
+    sendBtn.disabled = false;
+    setStatus(`Enter the code sent to ${email}.`);
+    armResendCooldown();
+  });
+
+  // "Change email" returns to the start (keep the entered message).
+  sendBtn.addEventListener("click", () => {
+    if (sendBtn.textContent !== "Change email") return;
+    showOtpStep(false);
+    sendBtn.textContent = "Send Message";
+    setStatus("");
+  });
+
+  /* --- Step 2: verify the code, then insert via the RPC --- */
+
+  verifyBtn.addEventListener("click", async () => {
+    const supabase = window.__supabaseClient || null;
+    if (!supabase || !otpEmail) return;
+
+    const code = otpInput.value.trim();
+    if (!/^\d{6,8}$/.test(code)) {
+      setStatus("Please enter the 6-8 digit code from the email.", true);
+      return;
+    }
+
+    verifyBtn.disabled = true;
+    setStatus("Verifying…");
+
+    // Prove the email belongs to the sender.
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: otpEmail,
+      token: code,
+      type: "email",
+    });
+
+    if (verifyError) {
+      verifyBtn.disabled = false;
+      setStatus("That code is invalid or has expired. Try again.", true);
+      return;
+    }
+
+    // Code verified — now insert through the RPC (validates + dedupes).
+    const { data, error: insertError } = await supabase.rpc("submit_message", {
+      p_name: document.getElementById("formName").value.trim(),
+      p_email: otpEmail,
+      p_message: document.getElementById("formMessage").value.trim(),
+    });
+
+    // Drop the temporary OTP session — visitors should never stay logged in.
+    await supabase.auth.signOut().catch(() => {});
+
+    if (insertError) {
+      verifyBtn.disabled = false;
+      setStatus(
+        "Something went wrong: " + (insertError.message || "unknown error"),
+        true
+      );
+      return;
+    }
+    if (!data || data.ok !== true) {
+      verifyBtn.disabled = false;
+      setStatus(
+        data && data.error ? data.error : "Something went wrong sending your message.",
+        true
+      );
+      return;
+    }
+
+    // Success — reset the form to a pristine state.
     form.reset();
+    showOtpStep(false);
+    sendBtn.textContent = "Send Message";
+    otpEmail = "";
+    setStatus("Thanks! Your message has been sent.");
+
+    // Celebrate the successful send: a physics burst + tumbling astronaut
+    // over the form (see js/celebration.js). Decorative and self-contained —
+    // it does nothing if Matter failed to load, and cleans itself up after.
+    if (window.ContactCelebration) window.ContactCelebration.celebrate();
+  });
+
+  /* --- Resend code (with a 60s cooldown) --- */
+
+  resendBtn.addEventListener("click", async () => {
+    if (!otpEmail || resendBtn.disabled) return;
+    setStatus(`Resending a code to ${otpEmail}…`);
+    const { error } = await sendOtp(otpEmail);
+    if (error) {
+      setStatus(
+        "Couldn't resend the code: " + (error.message || "unknown error"),
+        true
+      );
+      armResendCooldown();
+      return;
+    }
+    setStatus(`A new code is on its way to ${otpEmail}.`);
+    armResendCooldown();
   });
 })();

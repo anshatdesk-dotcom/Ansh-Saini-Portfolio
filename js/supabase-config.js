@@ -25,6 +25,11 @@
 window.SUPABASE_URL = "https://xbzeziqhxqsagmdjkzpl.supabase.co";
 window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemV6aXFoeHFzYWdtZGprenBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MDM3MjAsImV4cCI6MjEwNDM3OTcyMH0.o8ArWMI9Ssj3jneNzfThuO2iy6YTrujaPhDSMuW6Ud4";
 
+// The ONLY email allowed to open the hidden admin panel. Must match the
+// "ADMIN EMAIL" value used in the RLS policies (supabase/schema.sql) and
+// the account created in Authentication -> Users.
+window.ADMIN_EMAIL = "anshatdesk@gmail.com";
+
 window.__supabaseClient =
   window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
     ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)

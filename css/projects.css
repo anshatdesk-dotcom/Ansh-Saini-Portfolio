@@ -1,18 +1,58 @@
 /* ==========================================================================
-   projects.css — responsive card grid (equal-height cards)
-   Columns: 1 on mobile, 2 on tablet (>= 768px), 3 on desktop (>= 1024px).
+   projects.css — horizontal coverflow carousel
+   Cards sit in one horizontal row ("track") inside an overflow-hidden
+   viewport; the card nearest the viewport centre is scaled to 1 / full
+   opacity, cards further out shrink and fade (driven by
+   js/projects-carousel.js with GSAP).
    ========================================================================== */
 
-.project-grid {
-  display: grid;
-  grid-template-columns: 1fr; /* mobile */
-  gap: 1.5rem;
+.project-carousel {
+  position: relative;
 }
 
-/* Card is a flex column so all cards in a row stretch to equal height */
+/* ---------- Viewport (overflow crop + drag surface) ---------- */
+
+.project-carousel-viewport {
+  overflow: hidden;          /* side cards peek/crop at the edges */
+  touch-action: pan-y;       /* vertical page scroll stays native */
+  cursor: grab;
+  padding: 1rem 0 1.5rem;    /* breathing room for hover lift/shadow */
+}
+
+.project-carousel-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+/* ---------- Track (the single horizontal row) ---------- */
+
+.project-grid {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  will-change: transform;
+}
+
+/* Each card gets a wrapper so the coverflow scale/opacity (GSAP inline
+   styles on the wrapper) never fights the card's own hover transform. */
+.project-card-wrap {
+  flex: 0 0 auto;
+  width: min(78vw, 300px);   /* mobile: ~1-2 visible at once */
+  will-change: transform, opacity;
+  transition: transform 0.45s ease, opacity 0.45s ease;
+}
+
+@media (min-width: 768px) {
+  .project-card-wrap {
+    width: min(30vw, 340px); /* tablet/desktop: ~3-5 visible at once */
+  }
+}
+
+/* ---------- Card (content + hover unchanged) ---------- */
+
 .project-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0.875rem;
@@ -98,18 +138,37 @@
   color: #000000;
 }
 
-/* Tablet: 2 columns */
-@media (min-width: 768px) {
-  .project-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.75rem;
-  }
+/* ---------- Arrows ---------- */
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background-color: rgba(10, 10, 10, 0.6);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
-/* Desktop: 3 columns */
-@media (min-width: 1024px) {
-  .project-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-  }
+.carousel-arrow:hover {
+  background-color: var(--color-text);
+  color: #000000;
+  border-color: var(--color-text);
 }
+
+.carousel-arrow--prev {
+  left: 0;
+}
+
+.carousel-arrow--next {
+  right: 0;
+}
