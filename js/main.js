@@ -319,6 +319,11 @@
     sendBtn.textContent = "Send Message";
     otpEmail = "";
     setStatus("Thanks! Your message has been sent.");
+
+    // Celebrate the successful send: a physics burst + tumbling astronaut
+    // over the form (see js/celebration.js). Decorative and self-contained —
+    // it does nothing if Matter failed to load, and cleans itself up after.
+    if (window.ContactCelebration) window.ContactCelebration.celebrate();
   });
 
   /* --- Resend code (with a 60s cooldown) --- */

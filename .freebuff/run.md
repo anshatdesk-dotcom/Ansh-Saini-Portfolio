@@ -6,7 +6,14 @@ This is a plain static site — no build step, no dependencies, no env files to 
 
 - Files: `index.html`, `css/*.css`, `js/*.js`, `js/vendor/*.js`.
 - No `.env.local`, no `node_modules`, no package manager needed.
-- Vendored libraries (GSAP, ScrollTrigger, Three.js) are committed under `js/vendor/`.
+- Vendored libraries are committed under `js/vendor/` and loaded with plain
+  script tags (no bundler): GSAP, ScrollTrigger, Three.js, Lenis,
+  `supabase.min.js` (UMD build of `@supabase/supabase-js`) and
+  `matter.min.js` (browser build of the `matter-js` npm package, used by
+  `js/celebration.js` for the contact-form success celebration and by
+  `js/resume-physics.js` for the Resume section's floating tech icons).
+  If one needs updating, download the vendored build from the npm package and
+  drop it in `js/vendor/` — there is no install step.
 
 ## How to run the server
 

@@ -166,6 +166,35 @@
   cursor: default;
 }
 
+/* ---------- Success celebration (Matter.js canvas overlay) ---------- */
+
+/* js/celebration.js drops a transparent canvas over the whole contact section
+   and runs the physics celebration inside it. The section is the containing
+   block, so the burst has the empty space around and below the form to drift
+   into (inside the form alone, most of it would be hidden behind the fields).
+
+   The canvas paints *above* the section's content — the astronaut has to be
+   visible bouncing off the form's fields, not sliding around behind them —
+   while staying below the fixed nav (z-index 100) and the custom cursor
+   (z-index 10000). It never intercepts a click, so the form stays fully
+   usable while the celebration crosses it. */
+.contact {
+  position: relative;
+}
+
+.contact > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.celebration-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  pointer-events: none; /* purely decorative — never intercepts a click */
+}
+
 /* Name + email side by side once there is room */
 @media (min-width: 1024px) {
   .form-row {
