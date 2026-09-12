@@ -51,28 +51,28 @@
   justify-content: center;
   width: 56px;
   height: 56px;
-  border: 1px solid rgba(var(--brand-rgb, 255, 255, 255), 0.55);
+  border: 1px solid rgba(var(--brand-rgb, 255, 255, 255), 0.4);
   border-radius: 50%;
   background-image:
     radial-gradient(
       circle at 32% 26%,
-      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.12),
       rgba(255, 255, 255, 0) 45%
     ),
     radial-gradient(
       circle at 70% 78%,
-      rgba(var(--brand-rgb, 255, 255, 255), 0.42),
+      rgba(var(--brand-rgb, 255, 255, 255), 0.2),
       rgba(var(--brand-rgb, 255, 255, 255), 0) 70%
     ),
     radial-gradient(
       circle at 50% 50%,
-      rgba(14, 14, 16, 0.75),
-      rgba(5, 5, 7, 0.92)
+      rgba(14, 14, 16, 0.85),
+      rgba(5, 5, 7, 0.95)
     );
   box-shadow:
-    0 0 22px -6px rgba(var(--brand-rgb, 255, 255, 255), 0.9),
-    inset 0 0 18px -8px rgba(var(--brand-rgb, 255, 255, 255), 0.95),
-    0 10px 24px rgba(0, 0, 0, 0.45);
+    0 0 12px -6px rgba(var(--brand-rgb, 255, 255, 255), 0.55),
+    inset 0 0 10px -6px rgba(var(--brand-rgb, 255, 255, 255), 0.5),
+    0 8px 18px rgba(0, 0, 0, 0.4);
   will-change: transform; /* the loop writes transform every frame */
 }
 
@@ -88,10 +88,10 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0.4),
     rgba(255, 255, 255, 0) 72%
   );
-  opacity: 0.8;
+  opacity: 0.5;
   pointer-events: none;
 }
 
