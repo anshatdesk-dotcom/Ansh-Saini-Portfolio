@@ -43,6 +43,12 @@
   color: var(--color-text);
 }
 
+/* Per-letter spans created by js/nav-wobble.js for the logo and nav links */
+.wobble-char {
+  display: inline-block;
+  will-change: transform;
+}
+
 /* Keep the toggle above the slide-in panel so it can always close it */
 .nav-toggle {
   position: relative;

@@ -29,6 +29,22 @@
   color: var(--color-text-body);
 }
 
+/* Canvas overlay for the Orbiting Moons typing effect (js/contact-orbit.js).
+   Sits above the field so moons can fly outside its edges, but pointer-events
+   stay off so it never blocks clicking/typing into the real input. */
+.contact-orbit-canvas-wrap {
+  position: absolute;
+  inset: -40px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.contact-orbit-canvas-wrap canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .form-field input,
 .form-field textarea {
   width: 100%;

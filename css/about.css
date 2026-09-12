@@ -9,6 +9,20 @@
   align-items: center;
 }
 
+/* Background dot-field canvas from js/about-gravity-field.js — sits behind
+   the section's content, bends away from the cursor. */
+.about-gravity-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#about .container {
+  position: relative;
+  z-index: 1;
+}
+
 /* Stage for the chrome 3D sculpture (canvas mounted by js/about-scene.js).
    Same square slot and placement as the old photo placeholder. */
 .about-photo {
@@ -30,6 +44,16 @@
 
 .about-text em {
   color: var(--color-text-muted);
+}
+
+/* Per-word / per-char spans created by js/about-text-scatter.js */
+.about-word {
+  display: inline-block;
+  white-space: nowrap; /* keep a word's characters together across line wraps */
+}
+.about-char {
+  display: inline-block;
+  will-change: transform;
 }
 
 /* Tablet (>= 768px) and up: sculpture left, text right */

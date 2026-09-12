@@ -179,6 +179,67 @@
     });
   }
 
+  /* ------------------------------------------------- drag to spin/fling
+     The knot can be grabbed and dragged; releasing it flings it with the
+     drag's velocity, and it always eases back to its resting spin once
+     idle. Extra rotation is layered on `world` (on top of the continuous
+     auto-spin) so dragging never fights the ambient animation. */
+  const drag = {
+    active: false,
+    lastX: 0, lastY: 0,
+    velX: 0, velY: 0,     // current fling angular velocity
+    extraX: 0, extraY: 0, // accumulated extra rotation from dragging/flinging
+    appliedX: 0, appliedY: 0, // extra rotation already applied to world.rotation
+  };
+  const DRAG_SENSITIVITY = 0.012;       // drag px -> radians
+  const FLING_DAMPING = 0.955;          // how slowly fling velocity decays
+  const SPRING_BACK = 0.045;            // how strongly extra rotation eases to 0 when idle
+  const VELOCITY_EASE_WHEN_HELD = 0.35; // smooths raw per-event velocity while dragging
+
+  canvas.style.pointerEvents = "auto";
+  canvas.style.touchAction = "none";
+  canvas.style.cursor = "grab";
+
+  canvas.addEventListener("pointerdown", (e) => {
+    drag.active = true;
+    drag.lastX = e.clientX;
+    drag.lastY = e.clientY;
+    drag.velX = 0;
+    drag.velY = 0;
+    canvas.setPointerCapture(e.pointerId);
+    canvas.style.cursor = "grabbing";
+  });
+
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drag.active) return;
+    const dx = e.clientX - drag.lastX;
+    const dy = e.clientY - drag.lastY;
+    drag.lastX = e.clientX;
+    drag.lastY = e.clientY;
+
+    const instVelY = dx * DRAG_SENSITIVITY;
+    const instVelX = dy * DRAG_SENSITIVITY;
+    // Smooth instantaneous velocity so a fling isn't dictated by one jumpy event
+    drag.velY += (instVelY - drag.velY) * VELOCITY_EASE_WHEN_HELD;
+    drag.velX += (instVelX - drag.velX) * VELOCITY_EASE_WHEN_HELD;
+
+    drag.extraY += dx * DRAG_SENSITIVITY;
+    drag.extraX += dy * DRAG_SENSITIVITY;
+  });
+
+  const endDrag = (e) => {
+    if (!drag.active) return;
+    drag.active = false;
+    canvas.style.cursor = "grab";
+    if (e && canvas.hasPointerCapture(e.pointerId)) {
+      canvas.releasePointerCapture(e.pointerId);
+    }
+    // velX/velY already hold the fling velocity from the last drag movement
+  };
+  canvas.addEventListener("pointerup", endDrag);
+  canvas.addEventListener("pointercancel", endDrag);
+  canvas.addEventListener("lostpointercapture", endDrag);
+
   // ---------------------------------------------------------------- resize
   const setSize = () => {
     const w = mount.clientWidth || 1;
@@ -229,6 +290,26 @@
     pointer.y += (pointer.ty - pointer.y) * 0.05;
     mesh.rotation.y = pointer.x * 0.22;
     mesh.rotation.x = pointer.y * -0.18;
+
+    // Drag-to-spin / fling, always easing back to the resting rotation
+    if (drag.active) {
+      // While held, extra rotation follows the pointer directly (already
+      // accumulated in the pointermove handler) — nothing more to do here.
+    } else {
+      // Released: keep coasting on the last fling velocity, decaying it,
+      // while also always pulling the accumulated extra rotation back to 0.
+      drag.extraY += drag.velY;
+      drag.extraX += drag.velX;
+      drag.velY *= FLING_DAMPING;
+      drag.velX *= FLING_DAMPING;
+
+      drag.extraY += (0 - drag.extraY) * SPRING_BACK;
+      drag.extraX += (0 - drag.extraX) * SPRING_BACK;
+    }
+    world.rotation.y += drag.extraY - drag.appliedY;
+    world.rotation.x += drag.extraX - drag.appliedX;
+    drag.appliedY = drag.extraY;
+    drag.appliedX = drag.extraX;
 
     renderer.render(scene, camera);
   };

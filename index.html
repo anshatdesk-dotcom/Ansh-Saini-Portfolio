@@ -6,6 +6,13 @@
   <meta name="description" content="Personal portfolio of Ansh Saini — first-year B.Tech CSE student at USICT, GGSIPU." />
   <title>Ansh Saini | Portfolio</title>
 
+  <!-- Favicon: "AS" mark matching the navbar logo -->
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png" />
+
   <!-- Fonts: Sora (display/headings), Poppins (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -105,7 +112,7 @@
         <div class="about-grid">
           <!-- Chrome 3D sculpture stage (canvas mounted by js/about-scene.js) -->
           <div class="about-photo" id="aboutPhoto" role="img"
-            aria-label="Animated chrome 3D sculpture in a dark frame"></div>
+            aria-label="Animated chrome 3D sculpture in a dark frame, draggable to spin"></div>
 
           <div class="about-text">
             <p>
@@ -336,12 +343,24 @@
   <script src="js/hero-scene.js"></script>
   <!-- Chrome 3D sculpture for the About section -->
   <script src="js/about-scene.js"></script>
+  <!-- Background cursor-reactive dot field for the About section -->
+  <script src="js/about-gravity-field.js"></script>
+  <!-- Scatter-and-return effect on the About section's bio text -->
+  <script src="js/about-text-scatter.js"></script>
   <!-- Site motion layer (scroll reveals, hero entrance, nav effects) -->
   <script src="js/animations.js"></script>
+  <!-- Magnetic Repel effect on the hero "Ansh Saini" heading -->
+  <script src="js/hero-repel.js"></script>
+  <!-- Magnetic Pull effect on every section heading (About/Projects/Resume/Contact) -->
+  <script src="js/section-title-magnetic.js"></script>
   <!-- Rotating-roles typewriter for the hero tagline -->
   <script src="js/hero-typewriter.js"></script>
+  <!-- Orbiting Moons typing effect on the Contact form's Name/Email/Message fields -->
+  <script src="js/contact-orbit.js"></script>
   <!-- Custom glowing cursor (must be last: needs full DOM + no deps) -->
   <script src="js/cursor.js"></script>
+  <!-- Wobble hover effect on the logo and nav links -->
+  <script src="js/nav-wobble.js"></script>
   <!-- ============ HIDDEN ADMIN (no visible hint on the public site) ============ -->
   <!-- Rendered before the backend scripts below so js/admin.js can find it. -->
   <!-- Reachable only by clicking the "AS" logo 3 times within 2 seconds. -->

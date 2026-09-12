@@ -33,6 +33,12 @@
   color: var(--color-text);
 }
 
+/* Per-letter spans created by js/hero-repel.js for the Magnetic Repel effect */
+.hero-title-char {
+  display: inline-block;
+  will-change: transform;
+}
+
 .hero-tagline {
   margin-top: 1.25rem;
   font-weight: 300;
